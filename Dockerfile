@@ -19,6 +19,7 @@ WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
+RUN npm install turbo --global
 RUN npm install
  
 # Build the project
