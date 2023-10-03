@@ -5,7 +5,7 @@ RUN apk add --no-cache libc6-compat
 RUN apk update
 # Set working directory
 WORKDIR /app
-RUN yarn global add turbo
+RUN npm install turbo --global
 COPY . .
 RUN turbo prune --scope=web --docker
  
@@ -18,12 +18,12 @@ WORKDIR /app
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/yarn.lock ./yarn.lock
-RUN yarn install
+COPY --from=builder /app/out/package.json.lock ./package.json.lock
+RUN npm install
  
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN yarn turbo run build --filter=web...
+RUN npm run turbo run build --filter=web...
  
 FROM base AS runner
 WORKDIR /app
