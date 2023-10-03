@@ -18,12 +18,12 @@ WORKDIR /app
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/package.json.lock ./package.json.lock
+COPY --from=builder /app/out/package-lock.json ./package-lock.json
 RUN npm install
  
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN npm run turbo run build --filter=web...
+RUN turbo run build --filter=web...
  
 FROM base AS runner
 WORKDIR /app
