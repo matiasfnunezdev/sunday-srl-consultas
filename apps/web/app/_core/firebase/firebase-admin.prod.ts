@@ -1,6 +1,5 @@
 import * as fs from 'node:fs';
 import * as admin from 'firebase-admin';
-import type { Firestore } from 'firebase-admin/firestore';
 import { getLogger } from '../utils/logger';
 
 const logger = getLogger('info');
@@ -24,7 +23,7 @@ export function createFirebaseAdminApp(): admin.app.App {
   });
 }
 
-export function initializeAdminProd() {
+export function initializeAdminProd(): admin.firestore.Firestore {
   const app = createFirebaseAdminApp();
   return app.firestore() ;
 }

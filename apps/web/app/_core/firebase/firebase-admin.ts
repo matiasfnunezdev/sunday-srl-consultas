@@ -5,17 +5,17 @@ import { initializeAdminProd } from './firebase-admin.prod';
 
 export type FirebaseEnvType = 'local' | 'qa' | 'prod' | 'staging';
 
-export const firestore = async (): Promise<Firestore> => {
+export const firestore =  (): Firestore => {
   const environment = process.env.FIREBASE_ENV as FirebaseEnvType;
 
   switch (environment) {
     case 'local':
-      await initializeAdminQA();
+      initializeAdminQA();
       return getFirestore();
     case 'prod':
       return initializeAdminProd();
     default:
-      await initializeAdminQA();
+      initializeAdminQA();
       return getFirestore();
   }
 };
