@@ -3,28 +3,24 @@ import { firestore } from '../../_core/firebase/firebase-admin';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- description
 export async function POST(req: Request): Promise<any> {
-	const db = firestore();
+    const db = firestore();
 
-  	// eslint-disable-next-line no-console -- description
-	console.log('request', JSON.stringify(req));
+    const formData = await req.formData();
+    const body: Record<string, string> = {};
+    formData.forEach((value, key) => {
+        if (typeof value === 'string') {
+            body[key] = value;
+        }
+    });
 
-    	// eslint-disable-next-line no-console -- description
-	console.log('body', await req.text());
+    await createOne(body, db, 'messages');
 
-  	// eslint-disable-next-line no-console -- description
-	console.log('body', req.body);
-
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment -- description
-	const body: any = await req.json();
-
-	await createOne(body, db, 'messages');
-
-	return new Response('Message added', {
-		status: 200,
-	});
+    return new Response('Message added', {
+        status: 200,
+    });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- description
 export function GET(): any {
-	return 'hello world';
+    return 'hello world';
 }
