@@ -5,8 +5,8 @@ import { firestore } from "../../_core/firebase/firebase-admin"
 export async function POST(req: Request): Promise<any> {
  
   const db = firestore();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- description
-  const body: any = req.body;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment -- description
+  const body: any = await req.json();
   await createOne(body, db, 'messages');
    
   return new Response('Message added', {
