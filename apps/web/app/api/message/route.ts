@@ -8,6 +8,9 @@ export async function POST(req: Request): Promise<any> {
   	// eslint-disable-next-line no-console -- description
 	console.log('request', JSON.stringify(req));
 
+    	// eslint-disable-next-line no-console -- description
+	console.log('body', await req.text());
+
   	// eslint-disable-next-line no-console -- description
 	console.log('body', req.body);
 
