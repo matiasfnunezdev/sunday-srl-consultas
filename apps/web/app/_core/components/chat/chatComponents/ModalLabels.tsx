@@ -2,6 +2,7 @@
 
 import { faTags } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "./ButtonChat";
 
 const ModalLabels = () => {
   return (
@@ -59,28 +60,6 @@ const ModalLabels = () => {
         </div>
       </button>
     </div>
-  );
-};
-
-const Button = ({
-  text,
-  backgroundColor = "[#F2EC4C]",
-  textColor = "[#555759]",
-  hoverColor = "yellow-100",
-}) => {
-  return (
-    <button
-      className={`flex w-full mb-2 rounded-md px-16 text-left bg-${backgroundColor} flex-shrink-0 cursor-pointer select-none   p-2 text-[14px] leading-normal text-${textColor} transition-colors duration-200 hover:bg-${hoverColor}`}
-    >
-      <div className=" ">
-        <div className=" ">
-          <span className="">
-            {" "}
-            <FontAwesomeIcon icon={faTags} /> {text}
-          </span>
-        </div>
-      </div>
-    </button>
   );
 };
 
