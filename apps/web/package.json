@@ -14,6 +14,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@twilio/conversations": "^2.5.0",
     "firebase-admin": "^11.11.0",
     "next": "^13.4.19",
     "pino": "^8.15.4",

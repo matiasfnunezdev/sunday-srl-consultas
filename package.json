@@ -19,6 +19,7 @@
     "packages/*"
   ],
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.4.2"
+    "@fortawesome/fontawesome-free": "^6.4.2",
+    "@twilio/conversations": "^2.5.0"
   }
 }

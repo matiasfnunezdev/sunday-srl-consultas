@@ -8,7 +8,7 @@ import { Twilio } from 'twilio';
 export async function POST(req: Request) {
   const { body, from, conversationSid } = await req.json()
 
-  const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID, process.env.NEXT_PUBLIC_TWILIO_AUTH_TOKEN);
+  const client = new Twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
   try {
     await client.conversations.v1.conversations(conversationSid)
