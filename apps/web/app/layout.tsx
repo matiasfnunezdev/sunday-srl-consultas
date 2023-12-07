@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
 import { AuthProvider } from './_core/contexts/auth-context';
+import { ConversationsProvider } from './_core/contexts/conversations-context';
 
 const gothicBold = localFont({
 	src: [
@@ -31,11 +32,13 @@ export default function RootLayout({
 }): JSX.Element {
 	return (
 		<AuthProvider>
+			<ConversationsProvider>
 		<html className="bg-white" lang="en">
 			<body className={`${inter.className} ${gothicBold.variable}`}>
 				{children}
 			</body>
 		</html>
+		</ConversationsProvider>
 		</AuthProvider>
 	);
 }

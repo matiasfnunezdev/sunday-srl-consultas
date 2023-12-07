@@ -1,17 +1,17 @@
 /* eslint-disable unicorn/filename-case -- description */
  
-/* eslint-disable @typescript-eslint/no-unsafe-member-access -- description */
-/* eslint-disable no-console -- description */
-/* eslint-disable react-hooks/exhaustive-deps -- description */
  
-/* eslint-disable @typescript-eslint/no-unsafe-return -- description */
-/* eslint-disable @typescript-eslint/no-floating-promises -- description */
+ 
+ 
+ 
+ 
+ 
 /* eslint-disable jsx-a11y/click-events-have-key-events -- description */
 /* eslint-disable jsx-a11y/no-static-element-interactions -- description */
 /* eslint-disable react/jsx-sort-props -- description */
 /* eslint-disable react/self-closing-comp -- description */
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
-/* eslint-disable @next/next/no-img-element -- description */
+ 
 
 // Fetch initial conversation messages here
 import { useEffect, useState } from 'react';
@@ -79,6 +79,8 @@ export default function Header(props: HeaderProps) {
 			setSelectedConversationMessages(messages);
 		}
   }, [selectedConversation])
+	
+	console.log('conversation', conversations)
 
 	const renderConversations = conversations.map((conversation) => {
 		return (

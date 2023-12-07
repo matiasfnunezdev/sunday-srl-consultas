@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition -- description */
+ 
  
 /* eslint-disable react/function-component-definition -- description */
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
@@ -36,14 +36,6 @@ const ConversationsContext = createContext<IConversationsContext>({
   setTwilioClient: () => {}
 });
 
-export const useConversations = () => {
-  const context = useContext(ConversationsContext);
-  if (!context) {
-    throw new Error('useConversations must be used within a ConversationsProvider');
-  }
-  return context;
-};
-
 interface ConversationsProviderProps {
   children: ReactNode;
 }
@@ -68,4 +60,12 @@ export const ConversationsProvider: React.FC<ConversationsProviderProps> = ({ ch
       {children}
     </ConversationsContext.Provider>
   );
+};
+
+export const useConversations = () => {
+  const context = useContext(ConversationsContext);
+  if (!context) {
+    throw new Error('useConversations must be used within a ConversationsProvider');
+  }
+  return context;
 };

@@ -90,9 +90,14 @@ export default function Page(): JSX.Element {
 	 
 	const handleFetchConversationMessages = async (): Promise<void> => {
 		const result = await fetchConversations();
+		console.log('result', result)
 		setConversations(result)
 		setTimeStamp(new Date().getTime());
 	};
+	
+	useEffect(() => {
+		console.log('conversations useEffect1', conversations)
+	}, [conversations])
 
 	useEffect(() => {
 		async function fetchData(): Promise<void> {
@@ -100,17 +105,18 @@ export default function Page(): JSX.Element {
 				const result = await fetchConversations();
 
 				if (result.length) {
+					console.log('fetchConversations', result)
 					setConversations(result);
 				}
 			} catch (error) {
-				// eslint-disable-next-line no-console -- N/A
+				 
 				console.log('error', error)
 				throw new Error('Unexpected error fetching conversations');
 			}
 		}
 
 		void fetchData();
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- N/A
+		 
 	}, []);
 
 	useEffect(() => {
@@ -122,14 +128,14 @@ export default function Page(): JSX.Element {
       const messaging = getMessaging();
 
         onMessage(messaging, () => {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises -- N/A
+           
           handleFetchConversationMessages();
-					// eslint-disable-next-line no-console -- N/A
+					 
           console.log('ON MESSAGE1')
         });
       
 			} catch (error) {
-				// eslint-disable-next-line no-console -- N/A
+				 
 				console.log('error', error)
 				throw new Error('Unexpected error fetching conversations');
 			}
@@ -140,10 +146,10 @@ export default function Page(): JSX.Element {
 
 	useEffect(() => {
     if ('serviceWorker' in navigator) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises -- N/A
+       
       navigator.serviceWorker
         .register('/firebase-messaging-sw.js')
-        // eslint-disable-next-line no-console -- N/A
+         
         .then((registration) => { console.log('scope is: ', registration.scope); });
     }
   }, []);
@@ -157,9 +163,9 @@ export default function Page(): JSX.Element {
 
         if (type === 'FCM_MESSAGE') {
 
-					// eslint-disable-next-line @typescript-eslint/no-floating-promises -- N/A
+					 
           handleFetchConversationMessages();
-          // eslint-disable-next-line no-console -- N/A
+           
           console.log('ON MESSAGE2')
         }
       });
@@ -167,6 +173,7 @@ export default function Page(): JSX.Element {
   }, []);
 
 	useEffect(() => {
+		console.log('conversations useEffect', conversations)
     if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
