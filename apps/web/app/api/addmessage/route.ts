@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call -- description */
-/* eslint-disable @typescript-eslint/no-unsafe-return -- description */
+ 
+ 
 /* eslint-disable @typescript-eslint/no-unsafe-argument -- description */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment -- description */
 import { Twilio } from 'twilio';
@@ -15,8 +15,12 @@ export async function POST(req: Request) {
       .messages
       .create({ body, author: from });
 
-      return Response.json({ message: 'Message added'})
+      return new Response('Message added', {
+        status: 200
+      })
   } catch (error) {
-    return Response.json({ error: 'Unexpected error ocurred'})
+    return new Response('Unexpected error ocurred', {
+      status: 200
+    })
   }
 }

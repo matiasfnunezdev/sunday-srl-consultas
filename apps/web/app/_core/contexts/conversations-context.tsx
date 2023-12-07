@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition -- description */
-/* eslint-disable @typescript-eslint/no-explicit-any -- description */
+ 
 /* eslint-disable react/function-component-definition -- description */
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
 /* eslint-disable @typescript-eslint/no-empty-function -- description */
@@ -9,20 +9,19 @@
 "use client";
 import type { ReactNode } from 'react';
 import React, { createContext, useState, useContext } from 'react';
-
-export interface Conversation {
-  sid: string;
-  messages: any[];
-  conversationInfo?: any;
-}
+import type { Client } from '@twilio/conversations';
+import type { Conversation, SelectedConversation } from '../../_domain/interfaces/conversation';
+import type { ChatMessage } from '../../_domain/interfaces/message';
 
 interface IConversationsContext {
-  conversations: Conversation[];
+  conversations: Partial<Conversation>[];
   setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
-  selectedConversation: Conversation | null;
-  setSelectedConversation: React.Dispatch<React.SetStateAction<Conversation | null>>;
-  selectedConversationMessages: any[],
-  setSelectedConversationMessages: (messages: any[]) => void
+  selectedConversation: SelectedConversation | null;
+  setSelectedConversation: React.Dispatch<React.SetStateAction<SelectedConversation | null>>;
+  selectedConversationMessages: ChatMessage[],
+  setSelectedConversationMessages: (messages: ChatMessage[]) => void
+  twilioClient: Client | null;
+  setTwilioClient: (client: Client) => void
 }
 
 // Create the context with a default value
@@ -32,7 +31,9 @@ const ConversationsContext = createContext<IConversationsContext>({
   selectedConversation: null,
   setSelectedConversation: () => {},
   selectedConversationMessages: [],
-  setSelectedConversationMessages: () => {}
+  setSelectedConversationMessages: () => {},
+  twilioClient: null,
+  setTwilioClient: () => {}
 });
 
 export const useConversations = () => {
@@ -49,8 +50,9 @@ interface ConversationsProviderProps {
 
 export const ConversationsProvider: React.FC<ConversationsProviderProps> = ({ children }) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [selectedConversation, setSelectedConversation] = useState<SelectedConversation | null>(null);
   const [selectedConversationMessages, setSelectedConversationMessages] = useState<any[]>([]);
+  const [twilioClient, setTwilioClient] = useState<Client | null>(null);
 
   return (
     <ConversationsContext.Provider value={{
@@ -59,7 +61,9 @@ export const ConversationsProvider: React.FC<ConversationsProviderProps> = ({ ch
       selectedConversation,
       setSelectedConversation,
       selectedConversationMessages,
-      setSelectedConversationMessages
+      setSelectedConversationMessages,
+      twilioClient,
+      setTwilioClient
     }}>
       {children}
     </ConversationsContext.Provider>

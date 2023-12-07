@@ -38,6 +38,19 @@ module.exports = {
   // add rules configurations here
   rules: {
     "import/no-default-export": "off",
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": false, "optionalDependencies": false, "peerDependencies": false}]
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": false, "optionalDependencies": false, "peerDependencies": false}],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/no-unsafe-return": "off",
+    "@typescript-eslint/no-unsafe-member-access": "off",
+    "@typescript-eslint/no-redundant-type-constituents": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "no-console": "off",
+    "@next/next/no-img-element": "off",
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/no-unnecessary-condition": "off",
+    "react/no-unstable-nested-components": "off",
+    "@typescript-eslint/no-unsafe-argument": "off"
   },
 };

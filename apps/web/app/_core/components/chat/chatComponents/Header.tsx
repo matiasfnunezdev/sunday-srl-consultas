@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access -- description */
 /* eslint-disable no-console -- description */
 /* eslint-disable react-hooks/exhaustive-deps -- description */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- description */
+ 
 /* eslint-disable @typescript-eslint/no-unsafe-return -- description */
 /* eslint-disable @typescript-eslint/no-floating-promises -- description */
 /* eslint-disable jsx-a11y/click-events-have-key-events -- description */
@@ -16,6 +16,7 @@
 // Fetch initial conversation messages here
 import { useEffect, useState } from 'react';
 import { useConversations } from '../../../contexts/conversations-context';
+import type { Message } from '../../../../_domain/interfaces/message';
 
 interface HeaderProps {
 	timeStamp?: number
@@ -64,13 +65,14 @@ export default function Header(props: HeaderProps) {
   useEffect(() => {
     console.log('selectedConversation', selectedConversation)
 		if (selectedConversation?.messages.length) {
-			const messages = selectedConversation.messages.map((message) => {
-				const author = (message?.author ?? '') as string
-				console.log('author', author)
+			const messages = selectedConversation.messages.map((message: Message) => {
 				return {
-					role: author.includes('whatsapp') ? 'user' : 'assistant',
-					content: message?.body,
-					author: message?.author,
+					index: message.index,
+					role: message.author.includes('whatsapp') ? 'user' : 'assistant',
+					content: message.body,
+					author: message.author,
+					dateCreated: message.dateCreated,
+					media: message.media ?? null
 				}
 			})
 
@@ -84,7 +86,9 @@ export default function Header(props: HeaderProps) {
 				key={conversation.sid}
 				className="relative mr-4 cursor-pointer"
 				onClick={() => {
-					handleSetSelectedConversationSid(conversation.sid);
+					if (conversation.sid) {
+						handleSetSelectedConversationSid(conversation.sid);
+					}
 				}}
 			>
 				<div className=" h-10 w-10 rounded-md flex items-center justify-center text-white text-bold">
@@ -99,7 +103,7 @@ export default function Header(props: HeaderProps) {
 	return (
       <div className="flex items-center">
         <p className="text-lg font-bold text-white ml-2">SundaySocial</p>
-        <div className="flex px-6">{renderConversations}</div>
+        <section className="flex px-6 overflow-x-auto">{renderConversations}</section>
       </div>
 	);
 }

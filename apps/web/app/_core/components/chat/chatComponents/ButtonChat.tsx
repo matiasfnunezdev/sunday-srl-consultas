@@ -8,7 +8,7 @@ export function Button({
   textColor = "[#555759]",
   hoverColor = "yellow-100",
   padding = "2",
-  onClick,
+  onClick = () => {},
 }) {
   return (
     <button className={`flex w-full rounded-md px-16 text-left bg-${backgroundColor} flex-shrink-0 cursor-pointer select-none   p-${padding} text-[14px] leading-normal text-${textColor} transition-colors duration-200 hover:bg-${hoverColor}`}

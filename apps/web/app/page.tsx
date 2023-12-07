@@ -1,14 +1,25 @@
-/* eslint-disable jsx-a11y/anchor-is-valid -- description */
-import Link from 'next/link';
+'use client';
 
-export default function Page(): JSX.Element {
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Loading from './_core/components/primitives/loading/loading';
+
+export default function Home(): JSX.Element {
+	const router = useRouter()
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars -- N/A
+	const [isLoading, setIsLoading] = useState(true);
+
+	if (isLoading) {
+		return (
+			<div className='bg-white flex flex-row justify-center items-center h-screen'>
+				<Loading />
+			</div>
+		);
+	}
+
 	return (
-		<div className="flex items-center justify-center h-screen bg-gray-800">
-			<Link href="/chat" legacyBehavior>
-				<a className="px-4 py-2 bg-gray-700 text-white font-bold rounded hover:bg-gray-600 transition duration-300">
-					Ingresar
-				</a>
-			</Link>
+		<div className="bg-white">
+			<p className="text-black">home page</p>
 		</div>
 	);
 }
