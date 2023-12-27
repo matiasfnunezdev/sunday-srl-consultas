@@ -22,6 +22,10 @@ interface IConversationsContext {
   setSelectedConversationMessages: (messages: ChatMessage[]) => void
   twilioClient: Client | null;
   setTwilioClient: (client: Client) => void
+  selectedTags: { value: string; label: string }[],
+  setSelectedTags: (tags: { value: string; label: string }[]) => void;
+  isLoading: boolean;
+  setIsLoading: (value: boolean) => void;
 }
 
 // Create the context with a default value
@@ -33,7 +37,11 @@ const ConversationsContext = createContext<IConversationsContext>({
   selectedConversationMessages: [],
   setSelectedConversationMessages: () => {},
   twilioClient: null,
-  setTwilioClient: () => {}
+  setTwilioClient: () => {},
+  selectedTags: [],
+  setSelectedTags: () => {},
+  isLoading: false,
+  setIsLoading: () => {}
 });
 
 interface ConversationsProviderProps {
@@ -45,6 +53,10 @@ export const ConversationsProvider: React.FC<ConversationsProviderProps> = ({ ch
   const [selectedConversation, setSelectedConversation] = useState<SelectedConversation | null>(null);
   const [selectedConversationMessages, setSelectedConversationMessages] = useState<any[]>([]);
   const [twilioClient, setTwilioClient] = useState<Client | null>(null);
+  const [selectedTags, setSelectedTags] = useState<
+  { value: string; label: string }[]
+>([]);
+const [isLoading, setIsLoading] = useState(false);
 
   return (
     <ConversationsContext.Provider value={{
@@ -55,7 +67,11 @@ export const ConversationsProvider: React.FC<ConversationsProviderProps> = ({ ch
       selectedConversationMessages,
       setSelectedConversationMessages,
       twilioClient,
-      setTwilioClient
+      setTwilioClient,
+      selectedTags,
+      setSelectedTags,
+      isLoading,
+      setIsLoading
     }}>
       {children}
     </ConversationsContext.Provider>

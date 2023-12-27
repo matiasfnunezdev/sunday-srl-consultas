@@ -11,8 +11,10 @@ export function Button({
   onClick = () => {},
 }) {
   return (
-    <button className={`flex w-full rounded-md px-16 text-left bg-${backgroundColor} flex-shrink-0 cursor-pointer select-none   p-${padding} text-[14px] leading-normal text-${textColor} transition-colors duration-200 hover:bg-${hoverColor}`}
-      onClick={onClick}
+    <button
+    className={`flex w-content rounded-md px-16 text-left bg-${backgroundColor} flex-shrink-0 cursor-pointer select-none p-${padding} text-[14px] leading-normal text-${textColor} transition-colors duration-200 hover:bg-${hoverColor}`} 
+    onClick={onClick}
+      type="button"
     >
       <span className="flex items-center gap-2">
         {icon ? <FontAwesomeIcon icon={icon} /> : null} {text}

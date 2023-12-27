@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server';
-import type { ConversationInstance } from 'twilio/lib/rest/conversations/v1/conversation';
-import { fetchOpenConversations } from '../../_core/utils/twillio-utils';
+import { getAll } from '@/_core/firebase/collection-helpers';
+import { firebaseAdmin } from '@/_core/firebase/firebase-admin';
 
 export async function GET(
 	_request: Request
 ): Promise<
 	NextResponse<{
-		openConversations: ConversationInstance[];
+		openConversations: any[];
 	}>
 > {
-	const openConversations = await fetchOpenConversations();
+	firebaseAdmin();
+
+	const db = firebaseAdmin().firestore;
+
+	const openConversations = await getAll(db, 'conversations');
 
 	return NextResponse.json({ openConversations });
 }

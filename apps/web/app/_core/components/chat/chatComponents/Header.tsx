@@ -1,11 +1,4 @@
 /* eslint-disable unicorn/filename-case -- description */
- 
- 
- 
- 
- 
- 
- 
 /* eslint-disable jsx-a11y/click-events-have-key-events -- description */
 /* eslint-disable jsx-a11y/no-static-element-interactions -- description */
 /* eslint-disable react/jsx-sort-props -- description */
@@ -63,7 +56,6 @@ export default function Header(props: HeaderProps) {
   }, [timeStamp])
 
   useEffect(() => {
-    console.log('selectedConversation', selectedConversation)
 		if (selectedConversation?.messages.length) {
 			const messages = selectedConversation.messages.map((message: Message) => {
 				return {
@@ -80,7 +72,6 @@ export default function Header(props: HeaderProps) {
 		}
   }, [selectedConversation])
 	
-	console.log('conversation', conversations)
 
 	const renderConversations = conversations.map((conversation) => {
 		return (
@@ -105,7 +96,7 @@ export default function Header(props: HeaderProps) {
 	return (
       <div className="flex items-center">
         <p className="text-lg font-bold text-white ml-2">SundaySocial</p>
-        <section className="flex px-6 overflow-x-auto">{renderConversations}</section>
+        {/* <section className="flex px-6 overflow-x-auto">{renderConversations}</section> */}
       </div>
 	);
 }

@@ -1,10 +1,9 @@
-"use client"
+'use client';
 import type { Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
-import { AuthProvider } from './_core/contexts/auth-context';
-import { ConversationsProvider } from './_core/contexts/conversations-context';
+import { Providers } from './providers';
 
 const gothicBold = localFont({
 	src: [
@@ -31,14 +30,10 @@ export default function RootLayout({
 	children: React.ReactNode;
 }): JSX.Element {
 	return (
-		<AuthProvider>
-			<ConversationsProvider>
 		<html className="bg-white" lang="en">
 			<body className={`${inter.className} ${gothicBold.variable}`}>
-				{children}
+				<Providers>{children}</Providers>
 			</body>
 		</html>
-		</ConversationsProvider>
-		</AuthProvider>
 	);
 }

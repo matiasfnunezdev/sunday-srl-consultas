@@ -47,8 +47,6 @@ export async function GET(req: Request) {
 		});
 
 		if (response.status === 200) {
-			// eslint-disable-next-line no-console -- N/A
-			console.log('response.data', response.data);
 			return NextResponse.json(response.data);
 		}
 

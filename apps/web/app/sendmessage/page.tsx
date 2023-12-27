@@ -1,12 +1,12 @@
-/* eslint-disable react-hooks/exhaustive-deps -- description */
+ 
 /* eslint-disable @typescript-eslint/no-shadow -- description */
 /* eslint-disable @typescript-eslint/require-await -- description */
-/* eslint-disable @typescript-eslint/no-unsafe-return -- description */
-/* eslint-disable @typescript-eslint/no-explicit-any -- description */
-/* eslint-disable @typescript-eslint/no-floating-promises -- description */
-/* eslint-disable @typescript-eslint/no-unsafe-call -- description */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access -- description */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- description */
+ 
+ 
+ 
+ 
+ 
+ 
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
 'use client';
 
@@ -136,33 +136,6 @@ export default function Page() {
 
 		setState((prev) => ({ ...prev, selectedConversation }));
 	}, [state.conversations]);
-
-	// const handleSubmit = async (e: React.FormEvent) => {
-	// 	e.preventDefault();
-	// 	setLoading(true);
-
-	// 	try {
-	// 		const response = await fetch('/api/sendmessage', {
-	// 			method: 'POST',
-	// 			headers: {
-	// 				'Content-Type': 'application/json',
-	// 			},
-	// 			body: JSON.stringify({
-	// 				conversationSid,
-	// 				message,
-	// 			}),
-	// 		});
-
-	// 		const data = await response.json();
-	// 		console.log('Message sent:', data);
-
-	// 		// No need to update conversationMessages state here, it's already handled by the SDK
-	// 	} catch (error) {
-	// 		console.error('Error sending message:', error);
-	// 	} finally {
-	// 		setLoading(false);
-	// 	}
-	// };
 
 	let conversationContent;
     if (state.selectedConversation) {

@@ -1,33 +1,26 @@
-import type { Message } from "./message";
+import type { Message } from './message';
 
 export interface OpenConversations {
-  openConversations: Conversation[];
+	openConversations: Conversation[];
 }
 
 export interface Conversation {
-  accountSid: string;
-  chatServiceSid: string;
-  messagingServiceSid: string;
-  sid: string;
-  friendlyName: string | null;
-  uniqueName: string | null;
-  attributes: string;
-  state: string;
-  dateCreated: string;
-  dateUpdated: string;
-  timers: Record<string, unknown>;
-  url: string;
-  links: ConversationLinks;
-  bindings: null; // If bindings can be other types, replace `null` with the correct type(s)
+	id?: string;
+	conversationSId?: string;
+	inProgress?: boolean;
+	unreadMessagesCount?: number;
+	unread?: boolean;
+	author?: string;
+	created?: string;
 }
 
 export interface ConversationLinks {
-  participants: string;
-  messages: string;
-  webhooks: string;
+	participants: string;
+	messages: string;
+	webhooks: string;
 }
 
 export interface SelectedConversation {
-  sid: string;
-  messages: Message[];
+	sid: string;
+	messages: Message[];
 }

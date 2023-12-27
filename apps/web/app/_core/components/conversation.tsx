@@ -1,14 +1,14 @@
-/* eslint-disable no-console -- description */
+ 
 /* eslint-disable react/function-component-definition -- description */
-/* eslint-disable @typescript-eslint/no-unsafe-argument -- description */
-/* eslint-disable react-hooks/exhaustive-deps -- description */
-/* eslint-disable @typescript-eslint/no-unsafe-return -- description */
-/* eslint-disable @typescript-eslint/no-explicit-any -- description */
-/* eslint-disable @typescript-eslint/no-floating-promises -- description */
-/* eslint-disable @typescript-eslint/no-unsafe-call -- description */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- description */
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access -- description */
+ 
 import type { ChangeEvent, FormEvent } from 'react';
 import React, { useEffect, useState } from 'react';
 import ConversationsMessages from './conversation-messsages';
@@ -67,7 +67,7 @@ const Conversation: React.FC<ConversationProps> = ({ myIdentity, conversationPro
               className="flex-grow border rounded p-2"
               disabled={loadingState !== 'ready'}
               onChange={(e: ChangeEvent<HTMLInputElement>) => { setNewMessage(e.target.value); }}
-              placeholder="Type your message here..."
+              placeholder="Escriba su mensaje..."
               type="text"
               value={newMessage}
             />
