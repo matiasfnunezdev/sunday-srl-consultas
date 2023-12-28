@@ -8,7 +8,7 @@ export async function GET(req: Request) {
 		const { searchParams } = new URL(req.url);
 		const conversationSid = searchParams.get('conversationSid');
 
-		console.log('get conversation messages', conversationSid);
+		console.info('get conversation messages', conversationSid);
 
 		if (!conversationSid) {
 			throw new Error('Missing conversationSid');
@@ -16,10 +16,11 @@ export async function GET(req: Request) {
 
 		const result = await getConversationMessages(conversationSid);
 
-		console.log('get conversation messages result', JSON.stringify(result));
+		console.info('get conversation messages result', JSON.stringify(result));
 
 		return NextResponse.json({ messages: result });
 	} catch (error) {
+		console.error('get conversation messages error', error);
 		return NextResponse.json({
 			status: 'Unexpected error ocurred',
 			error: JSON.stringify(error),
