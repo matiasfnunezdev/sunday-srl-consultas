@@ -165,9 +165,9 @@ export default function TagsTable(props: UsersTableProps): JSX.Element {
 	});
 
 	useEffect(() => {
-		if (table.getState().columnFilters[0]?.id === 'firstName') {
-			if (table.getState().sorting[0]?.id !== 'firstName') {
-				table.setSorting([{ id: 'firstName', desc: false }]);
+		if (table.getState().columnFilters[0]?.id === 'description') {
+			if (table.getState().sorting[0]?.id !== 'description') {
+				table.setSorting([{ id: 'description', desc: false }]);
 			}
 		}
 	}, [table.getState().columnFilters[0]?.id]);

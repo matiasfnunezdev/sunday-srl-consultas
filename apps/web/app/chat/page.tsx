@@ -395,11 +395,11 @@ export default function Page(): JSX.Element {
 		}
 	}, [updateInfo]);
 
-	const renderFullName = `${userInfo?.firstName} ${userInfo?.lastName}`;
+	const renderFullName = `${userInfo?.displayName}`;
 
 	const fullNameInitials =
-		userInfo?.firstName && userInfo?.lastName
-			? getInitials(userInfo.firstName, userInfo.lastName)
+		userInfo?.displayName
+			? getInitials(userInfo.displayName?.split(' ')[0], userInfo.displayName?.split(' ')[1])
 			: undefined;
 
 	const renderLogOutModal = showLogOutModal ? (

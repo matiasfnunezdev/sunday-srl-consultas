@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { ApiResponse, UserData } from '@/_domain/interfaces/user/user';
 import { firebaseAdmin } from '@/_core/firebase/firebase-admin';
 import { validateFirebaseIdToken } from '@/_core/utils/verify-id-token';
-import { getOne } from '@/_core/firebase/collection-helpers';
+import { createOne, getOne } from '@/_core/firebase/collection-helpers';
 
 export async function POST(req: Request): Promise<NextResponse> {
 	try {
@@ -51,13 +51,32 @@ export async function GET(req: Request): Promise<NextResponse> {
 			await validateFirebaseIdToken(req, auth);
 			const db = firebaseAdmin().firestore;
 			const usersCollection = db.collection('users');
-			const user = await getOne(userId, 'uid', usersCollection);
+			let user = await getOne(userId, 'uid', usersCollection);
 			if (!user) {
-				response = {
-					success: false,
-					message: 'failure',
-					data: undefined,
-				};
+				const firebaseAuthUser = await auth.getUser(userId);
+
+				if (firebaseAuthUser) {
+					await createOne(
+						{
+							deleted: false,
+							email: firebaseAuthUser.email,
+							displayName: firebaseAuthUser.displayName,
+							mobileNumber: firebaseAuthUser.phoneNumber,
+							role: 'user',
+							status: 'active',
+							uid: userId,
+						},
+						db,
+						'users'
+					);
+					user = await getOne(userId, 'uid', usersCollection);
+				} else {
+					response = {
+						success: false,
+						message: 'failure',
+						data: undefined,
+					};
+				}
 			}
 
 			response = {
