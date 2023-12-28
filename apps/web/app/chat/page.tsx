@@ -41,7 +41,10 @@ interface SendMessageOutput {
 
 async function fetchMessages(conversationSid: string): Promise<any[]> {
 	const response = await fetch(
-		`/api/getconversationmessages?conversationSid=${conversationSid}`
+		`api/getconversationmessages?conversationSid=${conversationSid}`,
+		{
+			cache: 'no-store',
+		}
 	);
 	const data = await response.json();
 	return data.messages;
