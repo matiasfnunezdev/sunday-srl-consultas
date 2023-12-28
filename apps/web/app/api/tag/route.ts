@@ -187,7 +187,7 @@ export async function GET(req: Request): Promise<NextResponse> {
 				);
 			}
 			return NextResponse.json(
-				{ status: 'Error fetching user' },
+				{ status: 'Unexpected error ocurred', error: JSON.stringify(error) },
 				{ status: 500 }
 			);
 		}
@@ -217,7 +217,7 @@ export async function GET(req: Request): Promise<NextResponse> {
 				);
 			}
 			return NextResponse.json(
-				{ status: 'Error fetching users' },
+				{ status: 'Unexpected error ocurred', error: JSON.stringify(error) },
 				{ status: 500 }
 			);
 		}

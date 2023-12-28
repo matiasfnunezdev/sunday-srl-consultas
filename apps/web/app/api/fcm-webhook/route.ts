@@ -139,6 +139,9 @@ export async function POST(req: Request) {
 		// Handle the case where req.body is null.
 		throw new Error('Request body is null.');
 	} catch (error) {
-		return NextResponse.json({ status: 'Unexpected error ocurred' });
+		return NextResponse.json({
+			status: 'Unexpected error ocurred',
+			error: JSON.stringify(error),
+		});
 	}
 }

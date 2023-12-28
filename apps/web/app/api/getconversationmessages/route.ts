@@ -12,8 +12,11 @@ export async function GET(req: Request) {
 			return NextResponse.json({ messages: result });
 		}
 
-    return NextResponse.json({ status: 'Missing conversationSid' });
+		return NextResponse.json({ status: 'Missing conversationSid' });
 	} catch (error) {
-		return NextResponse.json({ status: 'Unexpected error ocurred1' });
+		return NextResponse.json({
+			status: 'Unexpected error ocurred',
+			error: JSON.stringify(error),
+		});
 	}
 }

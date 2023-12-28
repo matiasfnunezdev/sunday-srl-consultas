@@ -10,6 +10,9 @@ export async function POST(req: Request) {
 		await sendMessageToConversation(conversationSid, message);
 		return NextResponse.json({ status: 'Success' });
 	} catch (error) {
-		return NextResponse.json({ status: 'Unexpected error ocurred' });
+		return NextResponse.json({
+			status: 'Unexpected error ocurred',
+			error: JSON.stringify(error),
+		});
 	}
 }
