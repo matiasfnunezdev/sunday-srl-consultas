@@ -1,11 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getAuth, onAuthStateChanged, type User } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 import Loading from './_core/components/primitives/loading/loading';
+import { useAuth } from './_core/contexts/auth-context';
 
 export default function Home(): JSX.Element {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars -- N/A
+	const { handleRefetchUserInfo } = useAuth();
+	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		async function refetchUserInfo(currentUser: User): Promise<void> {
+			try {
+				const idTokenResult = await currentUser.getIdTokenResult();
+				const token = idTokenResult.token;
+				if (token) {
+					await handleRefetchUserInfo(token, currentUser.uid);
+				}
+			} catch {
+				throw new Error('refetchUserInfo: Unexpected error');
+			} finally {
+				setIsLoading(false);
+			}
+		}
+		const auth = getAuth();
+		const unsubscribe = onAuthStateChanged(auth, (userAuth) => {
+			if (userAuth) {
+				void refetchUserInfo(userAuth);
+				router.push('/dashboard');
+			} else {
+				router.push('/login');
+			}
+		});
+
+		return () => {
+			unsubscribe();
+		};
+	}, []);
 
 	if (isLoading) {
 		return (
