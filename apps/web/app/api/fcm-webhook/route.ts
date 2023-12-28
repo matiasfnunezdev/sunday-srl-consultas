@@ -35,104 +35,135 @@ export async function POST(req: Request) {
 			const params = new URLSearchParams(body);
 			const event = Object.fromEntries(params);
 
-			const clientCollection = db.collection('clients');
-			const conversationsCollection = db.collection('conversations');
+			if (event.EventType === 'onMessageAdded') {
+				const clientCollection = db.collection('clients');
+				const conversationsCollection = db.collection('conversations');
 
-			const author = event?.Author;
-			const participantSId = event?.ParticipantSid;
+				const author = event?.Author;
+				const participantSId = event?.ParticipantSid;
 
-			let client = await getOne(
-				participantSId,
-				'participantSId',
-				clientCollection
-			);
+				let messageBody;
 
-			if (!client) {
-				client = await createOne(
-					{
-						author,
-						participantSId,
-					},
-					db,
-					'clients'
-				);
-			}
+				if (event?.Body || event?.Body === '') {
+					if (event.Body === '') {
+						messageBody = 'Mensaje anterior editado';
+					} else {
+						messageBody = event.Body;
+					}
+				} else {
+					messageBody = null;
+				}
 
-			const conversationSId = event?.ConversationSid;
-
-			let conversation = await getOne(
-				conversationSId,
-				'conversationSId',
-				conversationsCollection
-			);
-
-			if (!conversation) {
-				conversation = await createOne(
-					{
-						conversationSId,
-						author,
-						openCase: true,
-						unreadMessagesCount: 1,
-						unread: true,
-					},
-					db,
-					'conversations'
-				);
-			} else {
-				const currentUnreadMessagesCount =
-					conversation?.unreadMessagesCount ?? 0;
-				conversation = await updateOne(
-					conversationSId,
-					'conversationSId',
-					{
-						conversationSId,
-						openCase: true,
-						unreadMessagesCount: currentUnreadMessagesCount + 1,
-						unread: true,
-					},
-					conversationsCollection
-				);
-			}
-
-			const cases = (await getAll(db, 'cases')) ?? [];
-
-			const hasAnOpenCase =
-				cases?.filter((customerCase) => customerCase?.open).length > 0;
-
-			if (!hasAnOpenCase) {
 				await createOne(
 					{
-						messageSIdStart: event?.MessageSid,
-						author,
-						conversationSId,
-						open: true,
+						accountSid: event?.AccountSid ?? null,
+						conversationSid: event?.ConversationSid ?? null,
+						messageSid: event?.MessageSid ?? null,
+						index: event?.Index ?? null,
+						author: event?.Author ?? null,
+						body: messageBody,
+						media: event?.Media ?? null,
+						participantSid: event?.ParticipantSid ?? null,
+						dateCreated: event?.DateCreated ? String(event?.DateCreated) : null,
+						dateUpdated: event?.DateUpdated ? String(event?.DateUpdated) : null,
 					},
 					db,
-					'cases'
+					'messages'
 				);
+
+				let client = await getOne(
+					participantSId,
+					'participantSId',
+					clientCollection
+				);
+
+				if (!client) {
+					client = await createOne(
+						{
+							author,
+							participantSId,
+						},
+						db,
+						'clients'
+					);
+				}
+
+				const conversationSId = event?.ConversationSid;
+
+				let conversation = await getOne(
+					conversationSId,
+					'conversationSId',
+					conversationsCollection
+				);
+
+				if (!conversation) {
+					conversation = await createOne(
+						{
+							conversationSId,
+							author,
+							openCase: true,
+							unreadMessagesCount: 1,
+							unread: true,
+						},
+						db,
+						'conversations'
+					);
+				} else {
+					const currentUnreadMessagesCount =
+						conversation?.unreadMessagesCount ?? 0;
+					conversation = await updateOne(
+						conversationSId,
+						'conversationSId',
+						{
+							conversationSId,
+							openCase: true,
+							unreadMessagesCount: currentUnreadMessagesCount + 1,
+							unread: true,
+						},
+						conversationsCollection
+					);
+				}
+
+				const cases = (await getAll(db, 'cases')) ?? [];
+
+				const hasAnOpenCase =
+					cases?.filter((customerCase) => customerCase?.open).length > 0;
+
+				if (!hasAnOpenCase) {
+					await createOne(
+						{
+							messageSIdStart: event?.MessageSid,
+							author,
+							conversationSId,
+							open: true,
+						},
+						db,
+						'cases'
+					);
+				}
+
+				const message = {
+					notification: {
+						title: `test`,
+						body: 'test',
+					},
+					data: {
+						timeStamp: new Date().getTime().toString(),
+					},
+					token:
+						'd7k24IsNA7-ZW-JTvmvbA9:APA91bHmM4QkryCM7JFDiV2nWw3IQqZBBtpg3Ro7tKjdDeluLlFkpG4huxs_Bi2wtCTaVj-ucGp1H5EuSSZIiaZWHw13n08QQk5uphfYGxHI0z3ojHoqijaSSqL8KZMPEwQOD6DhmqPu',
+				} as Message;
+
+				await admin.messaging().send(message);
+
+				const updatesRef = admin.database().ref('updates');
+				const newUpdateRef = updatesRef.push();
+
+				await newUpdateRef.set({
+					type: 'inbound-message',
+					timestamp: admin.database.ServerValue.TIMESTAMP,
+				});
 			}
-
-			const message = {
-				notification: {
-					title: `test`,
-					body: 'test',
-				},
-				data: {
-					timeStamp: new Date().getTime().toString(),
-				},
-				token:
-					'd7k24IsNA7-ZW-JTvmvbA9:APA91bHmM4QkryCM7JFDiV2nWw3IQqZBBtpg3Ro7tKjdDeluLlFkpG4huxs_Bi2wtCTaVj-ucGp1H5EuSSZIiaZWHw13n08QQk5uphfYGxHI0z3ojHoqijaSSqL8KZMPEwQOD6DhmqPu',
-			} as Message;
-
-			await admin.messaging().send(message);
-
-			const updatesRef = admin.database().ref('updates');
-			const newUpdateRef = updatesRef.push();
-
-			await newUpdateRef.set({
-				type: 'inbound-message',
-				timestamp: admin.database.ServerValue.TIMESTAMP,
-			});
 
 			return NextResponse.json({ status: 'Success' });
 		}

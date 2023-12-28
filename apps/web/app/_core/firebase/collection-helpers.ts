@@ -9,17 +9,20 @@ export async function createOne(
 	input: any,
 	db: Firestore,
 	collectionName: string
-): Promise<{
-	id: string;
-}> {
-	const collection = db.collection(collectionName);
+): Promise<any | undefined> {
+	try {
+		const collection = db.collection(collectionName);
 
-	const result = await collection.add({
-		...input,
-		created: new Date().toISOString(),
-	});
+		const result = await collection.add({
+			...input,
+			created: new Date().toISOString(),
+		});
 
-	return { ...input, id: result.id, created: new Date().toISOString() };
+		return { ...input, id: result.id, created: new Date().toISOString() };
+	} catch (error) {
+		console.error('createOne error', error);
+		return undefined;
+	}
 }
 
 export async function getOne(
@@ -27,16 +30,21 @@ export async function getOne(
 	field: string,
 	collection: CollectionReference
 ): Promise<any | undefined> {
-	const querySnapshot: QuerySnapshot = await collection
-		.where(field, '==', value)
-		.get();
+	try {
+		const querySnapshot: QuerySnapshot = await collection
+			.where(field, '==', value)
+			.get();
 
-	if (querySnapshot.empty) {
-		console.log('No such document!');
+		if (querySnapshot.empty) {
+			console.log('No such document!');
+			return undefined;
+		}
+		const doc = querySnapshot.docs[0];
+		return doc.data();
+	} catch (error) {
+		console.error('getOne error', error);
 		return undefined;
 	}
-	const doc = querySnapshot.docs[0];
-	return doc.data();
 }
 
 export async function updateOne(
@@ -70,7 +78,7 @@ export async function updateOne(
 export async function getAll(
 	db: Firestore,
 	collectionName: string
-): Promise<any[]> {
+): Promise<any[] | undefined> {
 	try {
 		const collection: CollectionReference = db.collection(collectionName);
 		const querySnapshot: QuerySnapshot = await collection.get();
@@ -81,7 +89,29 @@ export async function getAll(
 		}));
 	} catch (error) {
 		console.error('Error retrieving documents:', error);
-		throw error;
+		return undefined;
+	}
+}
+
+export async function getAllByField(
+	value: string,
+	field: string,
+	collection: CollectionReference
+): Promise<any[] | undefined> {
+	try {
+		const querySnapshot: QuerySnapshot = await collection
+			.where(field, '==', value)
+			.get();
+
+		if (querySnapshot.empty) {
+			console.log('No matching documents!');
+			return [];
+		}
+
+		return querySnapshot.docs.map((doc) => doc.data());
+	} catch (error) {
+		console.error('Error retrieving documents:', error);
+		return undefined;
 	}
 }
 
@@ -91,7 +121,7 @@ export async function editOneByField(
 	input: any,
 	db: Firestore,
 	collectionName: string
-): Promise<any> {
+): Promise<any | undefined> {
 	try {
 		const querySnapshot = await db
 			.collection(collectionName)
@@ -115,6 +145,6 @@ export async function editOneByField(
 		return { id: docRef.id };
 	} catch (error) {
 		console.error('Error updating document: ', error);
-		throw error;
+		return undefined;
 	}
 }

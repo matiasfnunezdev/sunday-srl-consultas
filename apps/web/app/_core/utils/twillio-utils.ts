@@ -18,18 +18,19 @@ export const fetchOpenConversations = async () => {
 export async function sendMessageToConversation(
 	conversationSid: string,
 	message: string
-): Promise<void> {
+): Promise<any | undefined> {
 	try {
+		let result;
 		// Initialize Twilio Client
 		const client = twilio(twillioConfig.accountSId, twillioConfig.authToken);
 
 		await client.conversations.v1
 			.conversations(conversationSid)
 			.messages.create({ body: message, author: 'Customer Support' })
-			// eslint-disable-next-line @typescript-eslint/no-shadow -- description
-			.then((message) => {
-				console.log(message.sid);
+			.then((msg) => {
+				result = msg;
 			});
+		return result;
 	} catch (error) {
 		console.error('Error sending message:', error);
 		throw new Error('Failed to send message');
