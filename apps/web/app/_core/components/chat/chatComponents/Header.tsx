@@ -1,8 +1,4 @@
-/* eslint-disable unicorn/filename-case -- description */
-/* eslint-disable jsx-a11y/click-events-have-key-events -- description */
-/* eslint-disable jsx-a11y/no-static-element-interactions -- description */
-/* eslint-disable react/jsx-sort-props -- description */
-/* eslint-disable react/self-closing-comp -- description */
+/* eslint-disable @typescript-eslint/no-unused-vars -- N/A */
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
  
 
@@ -27,10 +23,6 @@ export default function Header(props: HeaderProps) {
 	const [selectedConversationSid, setSelectedConversationSid] = useState<
 		string | null
 	>(null);
-
-	const handleSetSelectedConversationSid = (sid: string) => {
-		setSelectedConversationSid(sid);
-	};
 
 	const handleSelectedConversation = async (sid: string) => {
     const result = await fetchMessages(sid);
@@ -71,27 +63,6 @@ export default function Header(props: HeaderProps) {
 			setSelectedConversationMessages(messages);
 		}
   }, [selectedConversation])
-	
-
-	const renderConversations = conversations.map((conversation) => {
-		return (
-			<div
-				key={conversation.sid}
-				className="relative mr-4 cursor-pointer"
-				onClick={() => {
-					if (conversation.sid) {
-						handleSetSelectedConversationSid(conversation.sid);
-					}
-				}}
-			>
-				<div className=" h-10 w-10 rounded-md flex items-center justify-center text-white text-bold">
-					<img className="rounded-md" src="/wpIcon.png" alt="whatsapp icon" />
-				</div>
-				<span className="absolute top-0 right-0 bg-red-500 rounded-full h-3 w-3"></span>{' '}
-				{/* Badge rojo */}
-			</div>
-		);
-	});
 
 	return (
       <div className="flex items-center">

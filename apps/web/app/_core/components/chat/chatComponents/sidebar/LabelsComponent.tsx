@@ -12,7 +12,7 @@ export default function LabelsComponent(): JSX.Element {
 	const { selectedTags } = useConversations();
 	const [expandedPanel, setExpandedPanel] = useState(false);
 
-	const handleTogglePanel = () => {
+	const handleTogglePanel = (): void => {
 		setExpandedPanel((prevExpandedPanel) => !prevExpandedPanel);
 	};
 

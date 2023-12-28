@@ -1,10 +1,8 @@
 "use client";
 
-import { faTags } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "./ButtonChat";
 
-const ModalLabels = () => {
+export default function ModalLabels(): JSX.Element {
   return (
     <div
       style={{
@@ -45,14 +43,14 @@ const ModalLabels = () => {
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <Button
               backgroundColor="[#555759]"
+              hoverColor="gray-300"
               text="Evalúa propuesta"
               textColor="white"
-              hoverColor="gray-300"
             />
           </div>
         </div>
       </div>
-      <button className="flex px-14 mb-2 rounded-md  bg-[#F2EC4C] flex-shrink-0 cursor-pointer select-none   p-3 text-[14px] leading-normal text-[#555758] transition-colors duration-200 hover:bg-yellow-100">
+      <button className="flex px-14 mb-2 rounded-md  bg-[#F2EC4C] flex-shrink-0 cursor-pointer select-none   p-3 text-[14px] leading-normal text-[#555758] transition-colors duration-200 hover:bg-yellow-100" type="button">
         <div className="flex ">
           <div className="flex flex-col">
             <span> Etiquetar</span>
@@ -62,5 +60,3 @@ const ModalLabels = () => {
     </div>
   );
 };
-
-export default ModalLabels;

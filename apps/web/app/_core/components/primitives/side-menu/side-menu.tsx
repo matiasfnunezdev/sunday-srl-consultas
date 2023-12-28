@@ -34,19 +34,9 @@ export default function SideMenu(): JSX.Element {
 			route: '/dashboard/clientes',
 		},
 		{
-			label: 'Cuentas',
+			label: 'Casos',
 			icon: 'switch_account',
-			route: '/dashboard/cuentas',
-		},
-		{
-			label: 'Movimientos',
-			icon: 'trending_up',
-			route: '/dashboard/movimientos',
-		},
-		{
-			label: 'Reportes',
-			icon: 'breaking_news',
-			route: '/dashboard/reportes',
+			route: '/dashboard/casos',
 		},
 		{
 			label: 'Administración',
@@ -54,29 +44,13 @@ export default function SideMenu(): JSX.Element {
 			route: '/dashboard/administracion',
 			subItems: [
 				{
-					label: 'Bancos',
-					route: '/dashboard/administracion/bancos',
+					label: 'Etiquetas',
+					route: '/dashboard/administracion/etiquetas',
 				},
-				{
-					label: 'Empresas',
-					route: '/dashboard/administracion/empresas',
-				},
-				{
-					label: 'Monedas',
-					route: '/dashboard/administracion/monedas',
-				},
-				{
-					label: 'Paises',
-					route: '/dashboard/administracion/paises',
-				},
-				{
-					label: 'Tipos de movimientos',
-					route: '/dashboard/administracion/movimientos',
-				},
-				{
-					label: 'Usuarios',
-					route: '/dashboard/administracion/usuarios',
-				},
+				// {
+				// 	label: 'Usuarios',
+				// 	route: '/dashboard/administracion/usuarios',
+				// },
 			],
 		},
 	];
@@ -132,12 +106,12 @@ export default function SideMenu(): JSX.Element {
 	});
 
 	return (
-		<aside className="md:block md:w-32 lg:w-48 2xl:w-60 h-screen top-0 left-0 bg-[#093239] text-white">
+		<aside className="md:block md:w-56 lg:w-56 2xl:w-60 h-screen top-0 left-0 bg-[#093239] text-white">
 			<div className="flex flex-col p-4 bg-[#093239]">
 				<div className="static mb-4 2xl:mb-10">
 					<Link href="#">
 						<div className="font-gothic text-white text-center text-lg 2xl:text-2xl leading-[normal] uppercase">
-							Ardua <br /> Solutions
+							Sunday <br /> Social
 						</div>
 					</Link>
 					{/* <button className='absolute top-0 left-0' type='button'>

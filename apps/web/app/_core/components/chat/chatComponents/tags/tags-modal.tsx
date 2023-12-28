@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression -- N/A */
-import type { ReactNode } from 'react';
 import React, { useEffect, useState, useRef } from 'react';
 import Select from 'react-select';
 import { useConversations } from '@/_core/contexts/conversations-context';
+import { useAuth } from '@/_core/contexts/auth-context';
+import useGetTagsViewModel from '@/_presentation/tag/get-tags-view-model';
 
-function MyOption(props: any): ReactNode {
+function MyOption(props: any): any {
 	const { innerProps, innerRef } = props;
 	return (
 		<div
@@ -32,18 +33,48 @@ interface TagsModalProps {
 }
 export default function TagsModal(props: TagsModalProps): JSX.Element {
 	const { onClose } = props;
+	const { getTags, tags: tagsData, loading } = useGetTagsViewModel();
+	const { getAccessToken } = useAuth();
 	const { selectedTags, setSelectedTags } = useConversations();
 
-	const [options, setOptions] = useState<{ value: string; label: string }[]>([
-		{ value: '1', label: 'etiqueta de prueba' },
-	]);
+	const [options, setOptions] = useState<{ value: string; label: string }[]>(
+		[]
+	);
+
+	useEffect(() => {
+		async function fetchTags(): Promise<void> {
+			try {
+				const accessToken = await getAccessToken();
+				if (accessToken) {
+					await getTags(accessToken);
+				}
+			} catch {
+				throw new Error('fetchTags error: Unexpected error getting users');
+			}
+		}
+		void fetchTags();
+	}, []);
+
+	useEffect(() => {
+		if (tagsData?.length) {
+			setOptions(
+				tagsData?.map((tag) => {
+					return {
+						value: tag.tagId,
+						label: tag.description,
+					};
+				})
+			);
+		}
+	}, [tagsData]);
 
 	const modalRef = useRef<HTMLDivElement>(null);
 
 	const customStyles = {
-		control: (base: any) => ({
+		control: (base: any, { isDisabled }) => ({
 			...base,
 			minHeight: '49px',
+			backgroundColor: isDisabled ? 'transparent' : 'transparent',
 			borderRadius: 4,
 			borderColor: '#B3B3B3',
 			borderWidth: 1,
@@ -115,6 +146,16 @@ export default function TagsModal(props: TagsModalProps): JSX.Element {
 			fontSize: '14px',
 			fontWeight: '300',
 		}),
+		multiValueRemove: (base) => ({
+			...base,
+			color: "#fff",
+			backgroundColor: "transparent",
+			borderRadius: 0,
+			"&:hover": {
+				backgroundColor: "transparent",
+				color: "#F2EC4C"
+			}
+		}),
 		//Darle un alto al contenedor de las opciones para que no se vean todas las opciones al mismo tiempo
 		menuList: (provided: any) => ({
 			...provided,
@@ -164,7 +205,7 @@ export default function TagsModal(props: TagsModalProps): JSX.Element {
 						<div>
 							<div className="flex items-center justify-between rounded-t text-[18px]">
 								<div>
-									<span className='text-white'>Etiquetar</span>
+									<span className="text-white">Etiquetar</span>
 								</div>
 								<button
 									className="text-2 float-right ml-auto border-0 bg-transparent p-1 font-semibold leading-none text-white outline-none focus:outline-none"
@@ -196,16 +237,19 @@ export default function TagsModal(props: TagsModalProps): JSX.Element {
 										Option: MyOption,
 									}}
 									isClearable={false}
+									isDisabled={loading}
 									isMulti
 									isSearchable
 									menuPortalTarget={document.body}
 									menuShouldScrollIntoView
-									noOptionsMessage={() => 'Todas las etiquetas han sido agregadas'}
+									noOptionsMessage={() =>
+										'Todas las etiquetas han sido agregadas'
+									}
 									onChange={(selectedOptions) => {
 										setSelectedTags(Array.from(selectedOptions));
 									}}
 									options={options}
-									placeholder="Agregar etiqueta"
+									placeholder={loading ? 'Cargando...' : 'Agregar etiqueta'}
 									styles={customStyles}
 									theme={(theme) => ({
 										...theme,

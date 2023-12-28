@@ -44,23 +44,26 @@ export async function updateOne(
 	field: string,
 	updatedData: DocumentData,
 	collection: CollectionReference
-): Promise<boolean> {
+): Promise<DocumentData | undefined> {
 	const querySnapshot: QuerySnapshot = await collection
 		.where(field, '==', value)
 		.get();
 
 	if (querySnapshot.empty) {
 		console.log('No such document to update!');
-		return false;
+		return undefined;
 	}
+
 	const doc = querySnapshot.docs[0];
 
 	try {
 		await collection.doc(doc.id).update(updatedData);
-		return true;
+
+		const updatedDoc = await collection.doc(doc.id).get();
+		return { id: updatedDoc.id, ...updatedDoc.data() };
 	} catch (error) {
 		console.error('Error updating document:', error);
-		return false;
+		return undefined;
 	}
 }
 

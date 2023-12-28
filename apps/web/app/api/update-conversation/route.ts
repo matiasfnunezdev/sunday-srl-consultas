@@ -24,8 +24,6 @@ export async function POST(req: Request) {
 
 			const openCase = cases.find((value) => value?.open);
 
-			console.log('openCase', openCase);
-
 			if (openCase) {
 				await editOneByField(
 					'messageSIdStart',
@@ -42,7 +40,6 @@ export async function POST(req: Request) {
 
 		return NextResponse.json({ status: 'Success' });
 	} catch (error) {
-		console.log('error', error);
 		return NextResponse.json({ status: 'Unexpected error ocurred' });
 	}
 }

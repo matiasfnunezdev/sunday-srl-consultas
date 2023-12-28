@@ -31,12 +31,9 @@ export async function POST(req: Request) {
 
 			const db = firebaseAdmin().firestore;
 
-			console.log('Raw body:', body);
-
 			// Parse the body as URLSearchParams instead of JSON
 			const params = new URLSearchParams(body);
 			const event = Object.fromEntries(params);
-			console.log('event', event);
 
 			const clientCollection = db.collection('clients');
 			const conversationsCollection = db.collection('conversations');
@@ -97,9 +94,6 @@ export async function POST(req: Request) {
 				);
 			}
 
-			console.log('client', client);
-			console.log('conversation', conversation);
-
 			const cases = (await getAll(db, 'cases')) ?? [];
 
 			const hasAnOpenCase =
@@ -145,7 +139,6 @@ export async function POST(req: Request) {
 		// Handle the case where req.body is null.
 		throw new Error('Request body is null.');
 	} catch (error) {
-		console.log('error', error);
 		return NextResponse.json({ status: 'Unexpected error ocurred' });
 	}
 }

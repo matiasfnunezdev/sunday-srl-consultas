@@ -2,7 +2,7 @@
 export default function Dashboard(): JSX.Element {
 	return (
 		<div className="bg-white">
-			<p className="text-black">dashboard page</p>
+			<p className="text-black">No disponible</p>
 		</div>
 	);
 }

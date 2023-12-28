@@ -2,7 +2,7 @@ import type { ApiResponse, UserData } from '@/_domain/interfaces/user/user';
 import type { UserRepository } from '@/_domain/repositories/user-repository';
 
 export interface GetUserUseCase {
-	invoke: (accessToken: string) => Promise<ApiResponse<UserData>>;
+	invoke: (accessToken: string, uid: string) => Promise<ApiResponse<UserData>>;
 }
 
 export class GetUser implements GetUserUseCase {
@@ -12,7 +12,7 @@ export class GetUser implements GetUserUseCase {
 		this.userRepo = _userRepo;
 	}
 
-	invoke(accessToken: string): Promise<ApiResponse<UserData>> {
-		return this.userRepo.getUser(accessToken);
+	invoke(accessToken: string, uid: string): Promise<ApiResponse<UserData>> {
+		return this.userRepo.getUser(accessToken, uid);
 	}
 }

@@ -2,8 +2,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faDownload } from "@fortawesome/free-solid-svg-icons";
 
-function InfoIdComponent() {
-  const handleTogglePanel = () => {};
+export default function InfoIdComponent(): JSX.Element {
+  const handleTogglePanel = (): void => {};
 
   return (
     <div className="w-full bg-[#555759] rounded-md ">
@@ -40,5 +40,3 @@ function InfoIdComponent() {
     </div>
   );
 }
-
-export { InfoIdComponent };

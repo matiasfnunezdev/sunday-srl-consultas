@@ -1,21 +1,8 @@
 "use client";
 import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState, useEffect } from "react";
 
-const LabelAlert = () => {
-  const [showAlert, setShowAlert] = useState(true);
-
-  //   useEffect(() => {
-  //     const timer = setTimeout(() => {
-  //       setShowAlert(false);
-  //     }, 5000);
-  //     return () => clearTimeout(timer);
-  //   }, []);
-
-  //   if (!showAlert) {
-  //     return null;
-  //   }
+export default function LabelAlert(): JSX.Element {
 
   return (
     <div
@@ -34,11 +21,9 @@ const LabelAlert = () => {
       }}
     >
       <p style={{ color: "black", fontSize: 24 }}>
-        <FontAwesomeIcon icon={faCircleExclamation} className="pr-2" />
+        <FontAwesomeIcon className="pr-2" icon={faCircleExclamation} />
         Debe etiquetar antes de cerrar
       </p>
     </div>
   );
 };
-
-export default LabelAlert;

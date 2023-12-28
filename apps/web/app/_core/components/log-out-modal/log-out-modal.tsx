@@ -36,7 +36,7 @@ export default function LogOutModal(props: LogOutModalProps): JSX.Element {
 					style={{ height: '-webkit-fill-available' }}
 				>
 					<div
-						className={`w-[344px] dark:border-netural-400 z-50 inline-block transform overflow-hidden bg-white p-4 px-4 text-left align-bottom shadow-xl transition-all dark:bg-white sm:my-8 sm:w-[344px] sm:max-w-[58rem] sm:gap-6 sm:rounded-lg sm:border-2 sm:px-4 sm:py-4 sm:align-middle
+						className={`w-[344px] dark:border-netural-400 z-50 inline-block transform overflow-hidden bg-[#202123] p-4 px-4 text-left align-bottom shadow-xl transition-all dark:bg-[#202123] sm:my-8 sm:w-[344px] sm:max-w-[58rem] sm:gap-6 sm:rounded-lg sm:border-2 sm:px-4 sm:py-4 sm:align-middle
               }`}
 						ref={modalRef}
 						role="dialog"
@@ -48,7 +48,7 @@ export default function LogOutModal(props: LogOutModalProps): JSX.Element {
 						}}
 					>
 						<div>
-							<div className="flex flex-col items-center justify-between rounded-t text-[18px] text-black">
+							<div className="flex flex-col items-center justify-between rounded-t text-[18px] text-white">
 								<button
 									className="w-full flex justify-end items-right"
 									onClick={() => {
@@ -59,10 +59,10 @@ export default function LogOutModal(props: LogOutModalProps): JSX.Element {
 									<img
 										alt="Home"
 										className="w-[24px] h-[24px] mr-1 2xl:w-[24px] 2xl:h-[24px] text-[#d9d9d9]"
-										src="/icons/close.svg"
+										src="/icons/close-white.svg"
 									/>
 								</button>
-								<div className="text-black font-late text-xl font-medium leading-[normal] py-2">
+								<div className="text-white font-late text-xl font-medium leading-[normal] py-2">
 									¿Deseas cerrar sesión?
 								</div>
 								<div className="flex flex-row pt-6 justify-between gap-4">

@@ -37,7 +37,7 @@ export default function RootLayout({
 				const idTokenResult = await currentUser.getIdTokenResult();
 				const token = idTokenResult.token;
 				if (token) {
-					await handleRefetchUserInfo(token);
+					await handleRefetchUserInfo(token, currentUser.uid);
 				}
 			} catch {
 				throw new Error('refetchUserInfo: Unexpected error');
@@ -144,11 +144,11 @@ export default function RootLayout({
 												<button
 													className="block w-full cursor-pointer px-4 py-2 text-left font-lato"
 													onClick={() => {
-														setShowUserContextMenu(false);
+														router.push('/chat')
 													}}
 													type="button"
 												>
-													Mi Perfil
+													Chat
 												</button>
 											</li>
 											<hr className="border-[#d9d9d9] dark:border-[#d9d9d9]" />

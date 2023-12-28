@@ -5,10 +5,12 @@ import Input from '../_core/components/primitives/input/input';
 import Button from '../_core/components/primitives/button/button';
 import { useAuth } from '../_core/contexts/auth-context';
 import useGetUserViewModel from '@/_presentation/user/get-user-view-model';
+import { useSnackbar } from '@/_core/contexts/snackbar-context';
 
 export default function Login(): JSX.Element {
+	const addSnackbar = useSnackbar();
 	const { getUser, user: userInfo, error, loading } = useGetUserViewModel();
-	const { user, accessToken, signInFirebase, signOutFireabase, handleSetUserData, handleSetSecret } = useAuth();
+	const { user, accessToken, signInFirebase, signOutFireabase, handleSetUserData } = useAuth();
 	const router = useRouter();
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
@@ -38,10 +40,25 @@ export default function Login(): JSX.Element {
 	useEffect(() => {
 		async function fetchUserInfo(token: string): Promise<void> {
 			try {
-				await getUser(token);
+				const userUid = user?.uid
+				if (userUid) {
+					await getUser(token, userUid);
+				}
+				else {
+					addSnackbar({
+						key: 'error',
+						text: 'Error de autenticacion',
+						variant: 'error',
+					});
+				}
+				
 			} catch {
 				signOutFireabase();
-				throw new Error('fetchUserInfo: Unexpected error')
+				addSnackbar({
+					key: 'error',
+					text: 'Error de autenticacion',
+					variant: 'error',
+				});
 			}
 		}
 		if (user && accessToken) {
@@ -52,14 +69,7 @@ export default function Login(): JSX.Element {
 	useEffect(() => {
 		if (userInfo && !loading && !error) {
 			handleSetUserData(userInfo);
-			if (userInfo.authSecret) {
-				const secret: string = userInfo.authSecret
-				handleSetSecret(secret)
-				router.push('/login/authenticator/verify-code')
-			}
-			else {
-				router.push('/login/authenticator');
-			}
+			router.push('/chat')
 		}
 	}, [userInfo]);
 

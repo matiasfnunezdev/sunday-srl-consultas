@@ -1,4 +1,3 @@
-/* eslint-disable no-console -- description */
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
 
 import { NextResponse } from 'next/server';
@@ -37,7 +36,6 @@ export async function POST(req: Request) {
 			identity,
 		});
 	} catch (error) {
-		console.log('error', error);
 		return NextResponse.json({ status: 'Unexpected error ocurred' });
 	}
 }

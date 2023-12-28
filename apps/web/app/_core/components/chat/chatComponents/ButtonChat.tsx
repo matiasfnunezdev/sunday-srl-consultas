@@ -9,7 +9,7 @@ export function Button({
   hoverColor = "yellow-100",
   padding = "2",
   onClick = () => {},
-}) {
+}): JSX.Element {
   return (
     <button
     className={`flex w-content rounded-md px-16 text-left bg-${backgroundColor} flex-shrink-0 cursor-pointer select-none p-${padding} text-[14px] leading-normal text-${textColor} transition-colors duration-200 hover:bg-${hoverColor}`} 

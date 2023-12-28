@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import type { UserData } from '@/_domain/interfaces/user/user';
+import type { ApiResponse, UserData } from '@/_domain/interfaces/user/user';
 import { firebaseAdmin } from '@/_core/firebase/firebase-admin';
 import { validateFirebaseIdToken } from '@/_core/utils/verify-id-token';
+import { getOne } from '@/_core/firebase/collection-helpers';
 
 export async function POST(req: Request): Promise<NextResponse> {
 	try {
@@ -40,19 +41,26 @@ export async function POST(req: Request): Promise<NextResponse> {
 
 export async function GET(req: Request): Promise<NextResponse> {
 	const url = new URL(req.url);
-	const userId = url.searchParams.get('id');
+	const userId = url.searchParams.get('uid');
 
 	if (userId) {
 		try {
 			const auth = firebaseAdmin().auth;
 			await validateFirebaseIdToken(req, auth);
 			const db = firebaseAdmin().firestore;
-			const userRef = db.collection('users').doc(userId);
-			const doc = await userRef.get();
-			if (!doc.exists) {
+			const usersCollection = db.collection('users');
+			const user = await getOne(userId, 'uid', usersCollection);
+			if (!user) {
 				return NextResponse.json({ status: 'User not found' }, { status: 400 });
 			}
-			return NextResponse.json({ ...doc.data(), id: doc.id });
+
+			const response: ApiResponse<UserData> = {
+				success: true,
+				message: 'success',
+				data: user,
+			};
+
+			return NextResponse.json(response);
 		} catch (error) {
 			if (error?.errorInfo?.code === 'auth/argument-error') {
 				return NextResponse.json(
@@ -71,7 +79,14 @@ export async function GET(req: Request): Promise<NextResponse> {
 			await validateFirebaseIdToken(req, auth);
 			const db = firebaseAdmin().firestore;
 			const users = await db.collection('users').get();
-			return NextResponse.json(users.docs.map((doc) => doc.data()));
+
+			const response: ApiResponse<UserData[]> = {
+				success: true,
+				message: 'success',
+				data: users.docs.map((doc) => doc.data()) as UserData[],
+			};
+
+			return NextResponse.json(response);
 		} catch (error) {
 			if (error?.errorInfo?.code === 'auth/argument-error') {
 				return NextResponse.json(

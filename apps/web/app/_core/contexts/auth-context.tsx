@@ -16,7 +16,8 @@ interface AuthContextType {
   signOutFireabase: () => Promise<void>;
   handleSetSecret: (secret: string) => void
   handleSetUserData: (user: UserData) => void;
-  handleRefetchUserInfo: (token: string) => Promise<void>;
+  handleRefetchUserInfo: (token: string, uid: string) => Promise<void>;
+  getAccessToken: () => Promise<string | null>;
 };
 
 interface AuthContextProvider {
@@ -31,6 +32,21 @@ export const AuthProvider: React.FC<AuthContextProvider> = ({ children }) => {
   const [userInfo, setUserInfo] = useState<UserData | undefined>();
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [secret, setSecret] = useState<string | undefined>()
+
+  const getAccessToken = async (): Promise<string | null> => {
+    if (user) {
+      try {
+        const token = await user.getIdToken();
+        setAccessToken(token);
+        return token;
+      } catch (error) {
+        signOutFireabase();
+        console.error('Error refreshing token', error);
+        return null;
+      }
+    }
+    return accessToken;
+  };
 
   useEffect(() => {
     async function getEmailVerifyStatus(currentUser: User): Promise<void>{
@@ -86,8 +102,8 @@ export const AuthProvider: React.FC<AuthContextProvider> = ({ children }) => {
     setUserInfo(userData)
   }
 
-  const handleRefetchUserInfo = async (token: string): Promise<void> => {
-      await getUser(token);
+  const handleRefetchUserInfo = async (token: string, uid: string): Promise<void> => {
+      await getUser(token, uid);
   }
 
   return (
@@ -100,7 +116,8 @@ export const AuthProvider: React.FC<AuthContextProvider> = ({ children }) => {
       signOutFireabase, 
       handleSetSecret, 
       handleSetUserData,
-      handleRefetchUserInfo
+      handleRefetchUserInfo,
+      getAccessToken
        }}>
       {children}
     </AuthContext.Provider>

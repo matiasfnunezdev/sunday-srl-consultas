@@ -1,4 +1,3 @@
-/* eslint-disable no-console -- description */
 import twilio, { Twilio } from 'twilio';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- description
@@ -83,6 +82,6 @@ export async function fetchMedia(mediaSid: string): Promise<any> {
 	}
 
 	const data: any = await res.json();
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-return -- N/A
+
 	return data;
 }

@@ -51,6 +51,8 @@ module.exports = {
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/no-unnecessary-condition": "off",
     "react/no-unstable-nested-components": "off",
-    "@typescript-eslint/no-unsafe-argument": "off"
+    "@typescript-eslint/no-unsafe-argument": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "unicorn/filename-case": "off"
   },
 };
