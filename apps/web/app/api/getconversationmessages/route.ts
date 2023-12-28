@@ -7,12 +7,13 @@ export async function GET(req: Request) {
 	try {
 		const { searchParams } = new URL(req.url);
 		const conversationSid = searchParams.get('conversationSid');
-		if (conversationSid) {
-			const result = await getConversationMessages(conversationSid);
-			return NextResponse.json({ messages: result });
+
+		if (!conversationSid) {
+			throw new Error('Missing conversationSid');
 		}
 
-		return NextResponse.json({ status: 'Missing conversationSid' });
+		const result = await getConversationMessages(conversationSid);
+		return NextResponse.json({ messages: result });
 	} catch (error) {
 		return NextResponse.json({
 			status: 'Unexpected error ocurred',
