@@ -13,11 +13,11 @@ export const firebaseAdmin = (): { firestore: Firestore; auth: Auth } => {
 	switch (environment) {
 		case 'local':
 			initializeAdminQA();
-			return { firestore: getFirestore(), auth: getAuth() };
+			return { firestore: getFirestore('staging'), auth: getAuth() };
 		case 'prod':
 			return { firestore: initializeAdminProd(), auth: getAuth() };
 		default:
 			initializeAdminQA();
-			return { firestore: getFirestore(), auth: getAuth() };
+			return { firestore: getFirestore('staging'), auth: getAuth() };
 	}
 };
