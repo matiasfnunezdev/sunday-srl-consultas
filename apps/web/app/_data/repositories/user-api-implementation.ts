@@ -3,7 +3,7 @@ import { AxiosFetchRepository } from '@/_core/repositories/fetch-repository';
 import type { ApiResponse, UserData } from '@/_domain/interfaces/user/user';
 
 export class UserAPIImplementation extends AxiosFetchRepository {
-	private baseUrl = 'http://localhost:3000/api';
+	private baseUrl = process.env.BASE_URL;
 
 	getUser(accessToken: string, uid: string): Promise<ApiResponse<UserData>> {
 		const getUserInfoUrl = `${this.baseUrl}/user/?uid=${uid}`;

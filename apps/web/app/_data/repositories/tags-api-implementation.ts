@@ -4,7 +4,7 @@ import type { ApiResponse } from '@/_domain/interfaces/user/user';
 import type { Tag } from '@/_domain/interfaces/tag/tag';
 
 export class TagsAPIImplementation extends AxiosFetchRepository {
-	private baseUrl = 'http://localhost:3000/api';
+	private baseUrl = process.env.BASE_URL;
 
 	getTag(accessToken: string, id: string): Promise<ApiResponse<Tag>> {
 		const getUserInfoUrl = `${this.baseUrl}/tag/?id=${id}`;
