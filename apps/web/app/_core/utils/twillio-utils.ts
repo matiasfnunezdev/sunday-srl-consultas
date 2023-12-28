@@ -48,10 +48,6 @@ export async function getConversationMessages(
 		// Initialize Twilio Client
 		const client = twilio(twillioConfig.accountSId, twillioConfig.authToken);
 
-		await client.conversations.v1
-			.conversations(conversationSid)
-			.messages.list();
-
 		// Fetch messages
 		const messages = await client.conversations.v1
 			.conversations(conversationSid)

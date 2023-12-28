@@ -2,10 +2,9 @@ import type { AxiosRequestConfig } from 'axios';
 import { AxiosFetchRepository } from '@/_core/repositories/fetch-repository';
 import type { ApiResponse } from '@/_domain/interfaces/user/user';
 import type { Tag } from '@/_domain/interfaces/tag/tag';
-import { apiBaseUrl } from '@/_core/config/api-config';
 
 export class TagsAPIImplementation extends AxiosFetchRepository {
-	private baseUrl = apiBaseUrl;
+	private baseUrl = 'https://staging.sundaysrl.com/api';
 
 	getTag(accessToken: string, id: string): Promise<ApiResponse<Tag>> {
 		const getUserInfoUrl = `${this.baseUrl}/tag/?id=${id}`;

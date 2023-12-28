@@ -8,11 +8,16 @@ export async function GET(req: Request) {
 		const { searchParams } = new URL(req.url);
 		const conversationSid = searchParams.get('conversationSid');
 
+		console.log('get conversation messages', conversationSid);
+
 		if (!conversationSid) {
 			throw new Error('Missing conversationSid');
 		}
 
 		const result = await getConversationMessages(conversationSid);
+
+		console.log('get conversation messages result', JSON.stringify(result));
+
 		return NextResponse.json({ messages: result });
 	} catch (error) {
 		return NextResponse.json({
