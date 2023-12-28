@@ -1,11 +1,9 @@
 import twilio, { Twilio } from 'twilio';
+import { twillioConfig } from '../config/twillio-config';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- description
 export const fetchOpenConversations = async () => {
-	const client = new Twilio(
-		process.env.TWILIO_ACCOUNT_SID,
-		process.env.TWILIO_AUTH_TOKEN
-	);
+	const client = new Twilio(twillioConfig.accountSId, twillioConfig.authToken);
 	const conversations = await client.conversations.v1.conversations.list({
 		limit: 20,
 	});
@@ -23,9 +21,7 @@ export async function sendMessageToConversation(
 ): Promise<void> {
 	try {
 		// Initialize Twilio Client
-		const accountSid = process.env.TWILIO_ACCOUNT_SID;
-		const authToken = process.env.TWILIO_AUTH_TOKEN;
-		const client = twilio(accountSid, authToken);
+		const client = twilio(twillioConfig.accountSId, twillioConfig.authToken);
 
 		await client.conversations.v1
 			.conversations(conversationSid)
@@ -50,9 +46,7 @@ export async function getConversationMessages(
 ): Promise<any[]> {
 	try {
 		// Initialize Twilio Client
-		const accountSid = process.env.TWILIO_ACCOUNT_SID;
-		const authToken = process.env.TWILIO_AUTH_TOKEN;
-		const client = twilio(accountSid, authToken);
+		const client = twilio(twillioConfig.accountSId, twillioConfig.authToken);
 
 		await client.conversations.v1
 			.conversations(conversationSid)
