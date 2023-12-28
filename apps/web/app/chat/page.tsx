@@ -20,7 +20,6 @@ import { Sidebar } from '../_core/components/chat/chatComponents/sidebar/SideBar
 import { ModalResponder } from '../_core/components/chat/chatComponents/ResponderModal';
 import type {
 	Conversation,
-	OpenConversations,
 } from '../_domain/interfaces/conversation';
 import type { SendMessageResponse } from '../_domain/interfaces/send-message-response';
 import { firebaseCloudMessaging } from '../_core/firebase/firebase-messaging';
@@ -50,19 +49,25 @@ async function fetchMessages(conversationSid: string): Promise<any[]> {
 	return data.messages;
 }
 
-async function fetchConversations(): Promise<Conversation[]> {
+async function fetchConversations(
+	accessToken: string
+): Promise<Conversation[]> {
 	const res = await fetch('api/conversations', {
+		headers: {
+			'x-access-token': accessToken,
+		},
 		cache: 'no-store',
 	});
 
-	const data: OpenConversations = await res.json();
+	const data: any = await res.json();
 
-	return data.openConversations;
+	return data.data;
 }
 
 async function sendMessage(
 	conversationSid: string,
-	message: string
+	message: string,
+	accessToken: string
 ): Promise<SendMessageOutput> {
 	try {
 		const response = await fetch('api/sendmessage', {
@@ -79,7 +84,7 @@ async function sendMessage(
 		}
 
 		const sendMessageRes: SendMessageResponse = await response.json();
-		const conversations = await fetchConversations();
+		const conversations = await fetchConversations(accessToken);
 		return { sendMessageRes, conversations };
 	} catch (error) {
 		throw new Error('Failed to send message');
@@ -88,7 +93,8 @@ async function sendMessage(
 
 async function updateConversation(
 	conversationSId: string,
-	payload: any
+	payload: any,
+	accessToken: string
 ): Promise<any> {
 	try {
 		const response = await fetch('api/update-conversation', {
@@ -105,7 +111,7 @@ async function updateConversation(
 		}
 
 		const sendMessageRes: SendMessageResponse = await response.json();
-		const conversations = await fetchConversations();
+		const conversations = await fetchConversations(accessToken);
 		return { sendMessageRes, conversations };
 	} catch (error) {
 		throw new Error('Failed to send message');
@@ -114,7 +120,7 @@ async function updateConversation(
 
 export default function Page(): JSX.Element {
 	const router = useRouter();
-	const { handleRefetchUserInfo, userInfo } = useAuth();
+	const { handleRefetchUserInfo, getAccessToken, userInfo, isAuthReady } = useAuth();
 	const addSnackbar = useSnackbar();
 	const {
 		conversations,
@@ -147,20 +153,27 @@ export default function Page(): JSX.Element {
 	const handleSendMessage = async (message: string): Promise<void> => {
 		const sid = selectedConversation?.sid;
 		if (sid) {
-			const result = await sendMessage(selectedConversation.sid, message);
+			const accessToken = await getAccessToken();
+			if (accessToken) {
+				const result = await sendMessage(
+					selectedConversation.sid,
+					message,
+					accessToken
+				);
 
-			const { conversations: conversationsRes } = result;
+				const { conversations: conversationsRes } = result;
 
-			setConversations(conversationsRes);
+				setConversations(conversationsRes);
 
-			const fetchMessagesResult = await fetchMessages(sid);
+				const fetchMessagesResult = await fetchMessages(sid);
 
-			if (fetchMessagesResult) {
-				setSelectedConversation({
-					sid,
-					messages: fetchMessagesResult,
-				});
-				setSelectedConversationMessages(fetchMessagesResult);
+				if (fetchMessagesResult) {
+					setSelectedConversation({
+						sid,
+						messages: fetchMessagesResult,
+					});
+					setSelectedConversationMessages(fetchMessagesResult);
+				}
 			}
 		}
 	};
@@ -175,8 +188,11 @@ export default function Page(): JSX.Element {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	const handleFetchConversationMessages = async (): Promise<void> => {
-		const result = await fetchConversations();
-		setConversations(result);
+		const accessToken = await getAccessToken();
+		if (accessToken) {
+			const result = await fetchConversations(accessToken);
+			setConversations(result);
+		}
 	};
 
 	useEffect(() => {
@@ -204,10 +220,14 @@ export default function Page(): JSX.Element {
 		async function fetchData(): Promise<void> {
 			try {
 				setIsLoading(true);
-				const result = await fetchConversations();
+				const accessToken = await getAccessToken();
+				console.log('accessToken', accessToken)
+				if (accessToken) {
+					const result = await fetchConversations(accessToken);
 
-				if (result.length) {
-					setConversations(result);
+					if (result.length) {
+						setConversations(result);
+					}
 				}
 			} catch (error) {
 				throw new Error('Unexpected error fetching conversations');
@@ -216,7 +236,12 @@ export default function Page(): JSX.Element {
 			}
 		}
 
-		void fetchData();
+		if (isAuthReady) {
+			void fetchData();
+		}
+		else {
+			router.push('/')
+		}
 	}, []);
 
 	useEffect(() => {
@@ -296,13 +321,17 @@ export default function Page(): JSX.Element {
 			conversationSId: string
 		): Promise<void> {
 			try {
-				await updateConversation(conversationSId, {
-					inProgress: true,
-					unreadMessagesCount: 0,
-					unread: false,
-				});
-				const conversationsResult = await fetchConversations();
-				setConversations(conversationsResult);
+				const accessToken = await getAccessToken();
+				if (accessToken) {
+					await updateConversation(conversationSId, {
+						inProgress: true,
+						unreadMessagesCount: 0,
+						unread: false,
+					}, accessToken);
+					const conversationsResult = await fetchConversations(accessToken);
+					setConversations(conversationsResult);
+				}
+				
 			} catch {
 				throw new Error('Unexpected error updating conversation');
 			}
@@ -335,10 +364,14 @@ export default function Page(): JSX.Element {
 					});
 				}
 
-				const conversationsResult = await fetchConversations();
+				const accessToken = await getAccessToken();
+				if (accessToken) {
+					const conversationsResult = await fetchConversations(accessToken);
 				if (conversationsResult?.length) {
 					setConversations(conversationsResult);
 				}
+				}
+				
 			} catch (error) {
 				throw new Error('Unexpected error fetching conversations');
 			}
@@ -379,71 +412,73 @@ export default function Page(): JSX.Element {
 
 	return (
 		<div className="w-full flex flex-col justify-center items-center bg-[#202123]">
-			{userInfo ? <div className="w-full">
-				<div className="flex justify-between items-center px-2 2xl:px-6 py-2 2xl:py-4">
-				<p className="text-lg font-bold text-white ml-2">SundaySocial</p>
-					<div className='flex flex-row'>
-					{fullNameInitials ? (
-						<InitialsAvatar initials={fullNameInitials} />
-					) : null}
-					<div
-						className="flex items-center justify-start py-2 px-0.5 rounded"
-						onClick={openMenu}
-						onKeyDown={undefined}
-						role="button"
-						tabIndex={0}
-					>
-						<div className="pl-4 text-sm 2xl:text-base text-white font-lato font-medium leading-[normal]">
-							{renderFullName}
+			{userInfo ? (
+				<div className="w-full">
+					<div className="flex justify-between items-center px-2 2xl:px-6 py-2 2xl:py-4">
+						<p className="text-lg font-bold text-white ml-2">SundaySocial</p>
+						<div className="flex flex-row">
+							{fullNameInitials ? (
+								<InitialsAvatar initials={fullNameInitials} />
+							) : null}
+							<div
+								className="flex items-center justify-start py-2 px-0.5 rounded"
+								onClick={openMenu}
+								onKeyDown={undefined}
+								role="button"
+								tabIndex={0}
+							>
+								<div className="pl-4 text-sm 2xl:text-base text-white font-lato font-medium leading-[normal]">
+									{renderFullName}
+								</div>
+								<div>
+									<SubMenuToggleButton
+										color="white"
+										toggled={showUserContextMenu}
+									/>
+								</div>
+							</div>
 						</div>
-						<div>
-							<SubMenuToggleButton
-								color="white"
-								toggled={showUserContextMenu}
-							/>
-						</div>
+						{showUserContextMenu ? (
+							<div
+								className="absolute z-20 w-[150px] divide-y divide-gray-100 border border-neutral-500 rounded-lg bg-[#202123] text-right shadow dark:divide-gray-600 dark:bg-[#202123]"
+								ref={menuRef}
+								style={{
+									top: 60,
+									right: 30,
+								}}
+							>
+								<ul className="py-2 text-base font-lato text-white dark:text-white">
+									<li>
+										<button
+											className="flex justify-start items-center block w-full cursor-pointer px-4 py-2 text-left font-lato"
+											onClick={() => {
+												setShowUserContextMenu(false);
+												router.push('dashboard');
+											}}
+											type="button"
+										>
+											Backoffice
+										</button>
+									</li>
+									<hr className="border-neutral-500 dark:border-neutral-500" />
+									<li className="flex justify-center items-center mt-1">
+										<button
+											className="flex justify-start items-center text-[#df4848] font-lato leading-[normal] block w-full cursor-pointer px-4 py-2 text-left"
+											onClick={() => {
+												setShowLogOutModal(true);
+												setShowUserContextMenu(false);
+											}}
+											type="button"
+										>
+											Cerrar sesion
+										</button>
+									</li>
+								</ul>
+							</div>
+						) : null}
 					</div>
-					</div>
-					{showUserContextMenu ? (
-						<div
-							className="absolute z-20 w-[150px] divide-y divide-gray-100 border border-neutral-500 rounded-lg bg-[#202123] text-right shadow dark:divide-gray-600 dark:bg-[#202123]"
-							ref={menuRef}
-							style={{
-								top: 60,
-								right: 30,
-							}}
-						>
-							<ul className="py-2 text-base font-lato text-white dark:text-white">
-								<li>
-									<button
-										className="flex justify-start items-center block w-full cursor-pointer px-4 py-2 text-left font-lato"
-										onClick={() => {
-											setShowUserContextMenu(false);
-											router.push('dashboard');
-										}}
-										type="button"
-									>
-										Backoffice
-									</button>
-								</li>
-								<hr className="border-neutral-500 dark:border-neutral-500" />
-								<li className="flex justify-center items-center mt-1">
-									<button
-										className="flex justify-start items-center text-[#df4848] font-lato leading-[normal] block w-full cursor-pointer px-4 py-2 text-left"
-										onClick={() => {
-											setShowLogOutModal(true);
-											setShowUserContextMenu(false);
-										}}
-										type="button"
-									>
-										Cerrar sesion
-									</button>
-								</li>
-							</ul>
-						</div>
-					) : null}
 				</div>
-			</div> : null}
+			) : null}
 			<div className="w-full flex flex-col md:flex-row bg-[#202123] min-h-screen">
 				<aside className="bg-gray-900 h-screen md:block hidden absolute inset-y-0 right-0 transform md:relative md:translate-x-0 transition duration-200 ease-in-out">
 					{/* Sidebar content here */}

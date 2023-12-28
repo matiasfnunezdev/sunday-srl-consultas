@@ -1,31 +1,38 @@
-/* eslint-disable unicorn/filename-case -- description */
+ 
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
 
 import { Button } from './ButtonChat';
 import type { SendMessageResponse } from '@/_domain/interfaces/send-message-response';
-import type { Conversation, OpenConversations } from '@/_domain/interfaces/conversation';
+import type { Conversation } from '@/_domain/interfaces/conversation';
 import { useConversations } from '@/_core/contexts/conversations-context';
 import { useSnackbar } from '@/_core/contexts/snackbar-context';
+import { useAuth } from '@/_core/contexts/auth-context';
 
 interface FooterComponentProps {
 	onRespond: () => void;
 	onEtiquetar: () => void;
 }
 
-async function fetchConversations(): Promise<Conversation[]> {
+async function fetchConversations(
+	accessToken: string
+): Promise<Conversation[]> {
 	const res = await fetch('api/conversations', {
+		headers: {
+			'x-access-token': accessToken,
+		},
 		cache: 'no-store',
 	});
 
-	const data: OpenConversations = await res.json();
+	const data: any = await res.json();
 
-	return data.openConversations;
+	return data.data;
 }
 
 async function updateConversation(
 	conversationSId: string,
-	payload: any
+	payload: any,
+	accessToken: string
 ): Promise<any> {
 	try {
 		const response = await fetch('api/update-conversation', {
@@ -42,7 +49,7 @@ async function updateConversation(
 		}
 
 		const sendMessageRes: SendMessageResponse = await response.json();
-		const conversations = await fetchConversations();
+		const conversations = await fetchConversations(accessToken);
 		return { sendMessageRes, conversations };
 	} catch (error) {
 		throw new Error('Failed to send message');
@@ -51,6 +58,7 @@ async function updateConversation(
 
 export function FooterComponent(props: FooterComponentProps) {
 	const { onRespond, onEtiquetar } = props;
+	const { getAccessToken } = useAuth();
 	const addSnackbar = useSnackbar();
 
   const { selectedTags, selectedConversation, setSelectedTags, setConversations, setSelectedConversation, setSelectedConversationMessages } = useConversations();
@@ -63,15 +71,19 @@ export function FooterComponent(props: FooterComponentProps) {
 				setSelectedConversation(null)
 				setSelectedConversationMessages([])
 				setSelectedTags([])
-				await updateConversation(sid, {
-					inProgress: false,
-					unreadMessagesCount: 0,
-					unread: false,
-					closeCase: true,
-					tags: selectedTags
-				});
-				const conversationsResult = await fetchConversations();
-				setConversations(conversationsResult);
+				const accessToken = await getAccessToken();
+				if (accessToken) {
+					await updateConversation(sid, {
+						inProgress: false,
+						unreadMessagesCount: 0,
+						unread: false,
+						closeCase: true,
+						tags: selectedTags
+					}, accessToken);
+					const conversationsResult = await fetchConversations(accessToken);
+					setConversations(conversationsResult);
+				}
+				
 			}
 		}
 		else {

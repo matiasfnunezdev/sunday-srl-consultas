@@ -1,29 +1,34 @@
 import { NextResponse } from 'next/server';
-import { getAll } from '@/_core/firebase/collection-helpers';
+import type { ApiResponse } from '@/_domain/interfaces/user/user';
 import { firebaseAdmin } from '@/_core/firebase/firebase-admin';
+import { validateFirebaseIdToken } from '@/_core/utils/verify-id-token';
+import { getAll } from '@/_core/firebase/collection-helpers';
 
-export async function GET(
-	_request: Request
-): Promise<
-	NextResponse<
-		| {
-				openConversations: any[];
-		  }
-		| any
-	>
-> {
+export async function GET(req: Request): Promise<NextResponse> {
 	try {
-		firebaseAdmin();
-
+		const auth = firebaseAdmin().auth;
+		await validateFirebaseIdToken(req, auth);
 		const db = firebaseAdmin().firestore;
+		const conversations = await getAll(db, 'conversations');
 
-		const openConversations = await getAll(db, 'conversations');
+		const response: ApiResponse<any[]> = {
+			success: true,
+			message: 'success',
+			data: (conversations as any[]) ?? [],
+		};
 
-		return NextResponse.json({ openConversations });
+		return NextResponse.json(response);
 	} catch (error) {
-		return NextResponse.json({
-			status: 'Unexpected error ocurred',
-			error: JSON.stringify(error),
-		});
+		console.log('error', error);
+		if (error?.errorInfo?.code === 'auth/argument-error') {
+			return NextResponse.json(
+				{ status: 'Unauthorized access' },
+				{ status: 401 }
+			);
+		}
+		return NextResponse.json(
+			{ status: 'Error fetching conversations' },
+			{ status: 500 }
+		);
 	}
 }

@@ -1,6 +1,6 @@
 "use client"
 /* eslint-disable react/function-component-definition -- N/A */
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, onIdTokenChanged, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
 import type { ReactNode} from 'react';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import firebaseApp from '../firebase/fireabase';
@@ -12,6 +12,7 @@ interface AuthContextType {
   userInfo: UserData | undefined;
   accessToken: string | null;
   secret: string | undefined;
+  isAuthReady: boolean;
   signInFirebase: (email: string, password: string) => Promise<void>;
   signOutFireabase: () => Promise<void>;
   handleSetSecret: (secret: string) => void
@@ -32,14 +33,20 @@ export const AuthProvider: React.FC<AuthContextProvider> = ({ children }) => {
   const [userInfo, setUserInfo] = useState<UserData | undefined>();
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [secret, setSecret] = useState<string | undefined>()
+  const [isAuthReady, setIsAuthReady] = useState(false);
 
   const getAccessToken = async (): Promise<string | null> => {
-    if (user) {
+    
+    const auth = getAuth(firebaseApp);
+    console.log('getAccessToken', auth?.currentUser)
+    if (auth?.currentUser) {
       try {
-        const token = await user.getIdToken();
+        const token = await auth?.currentUser.getIdToken();
+        console.log('token', token)
         setAccessToken(token);
         return token;
       } catch (error) {
+        console.log('error', error)
         signOutFireabase();
         console.error('Error refreshing token', error);
         return null;
@@ -47,6 +54,30 @@ export const AuthProvider: React.FC<AuthContextProvider> = ({ children }) => {
     }
     return accessToken;
   };
+
+  useEffect(() => {
+    const auth = getAuth(firebaseApp);
+
+    console.log('auth', auth);
+
+    async function updateAccessToken(authUser: User | null): Promise<void> {
+      if (authUser) {
+        setUser(authUser);
+        const token = await authUser.getIdToken(true);
+        setAccessToken(token);
+      } else {
+        setUser(null);
+        setAccessToken(null);
+      }
+    }
+
+    const unsubscribe = onIdTokenChanged(auth, (authUser) => {
+      console.log('onIdTokenChanged', authUser)
+      void updateAccessToken(authUser)
+    });
+
+    return () => { unsubscribe(); };
+  }, []);
 
   useEffect(() => {
     async function getEmailVerifyStatus(currentUser: User): Promise<void>{
@@ -58,9 +89,12 @@ export const AuthProvider: React.FC<AuthContextProvider> = ({ children }) => {
       }
     }
     const auth = getAuth(firebaseApp);
+
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      console.log('onAuthStateChanged', authUser)
       if (authUser) {
         setUser(authUser);
+        setIsAuthReady(true);
         void getEmailVerifyStatus(authUser)
       } else {
         setUser(null);
@@ -111,7 +145,8 @@ export const AuthProvider: React.FC<AuthContextProvider> = ({ children }) => {
       accessToken, 
       user, 
       userInfo, 
-      secret, 
+      secret,
+      isAuthReady,
       signInFirebase, 
       signOutFireabase, 
       handleSetSecret, 
