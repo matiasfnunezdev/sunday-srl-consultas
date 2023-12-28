@@ -45,22 +45,30 @@ export async function GET(req: Request): Promise<NextResponse> {
 
 	if (userId) {
 		try {
+			let response: ApiResponse<UserData | undefined>;
+
 			const auth = firebaseAdmin().auth;
 			await validateFirebaseIdToken(req, auth);
 			const db = firebaseAdmin().firestore;
 			const usersCollection = db.collection('users');
 			const user = await getOne(userId, 'uid', usersCollection);
 			if (!user) {
-				return NextResponse.json({ status: 'User not found' }, { status: 400 });
+				response = {
+					success: false,
+					message: 'failure',
+					data: undefined,
+				};
 			}
 
-			const response: ApiResponse<UserData> = {
+			response = {
 				success: true,
 				message: 'success',
 				data: user,
 			};
 
-			return NextResponse.json(response);
+			return NextResponse.json(response, {
+				status: response.success ? 200 : 400,
+			});
 		} catch (error) {
 			if (error?.errorInfo?.code === 'auth/argument-error') {
 				return NextResponse.json(
