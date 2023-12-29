@@ -1,4 +1,6 @@
  
+"use client"
+
 import ReadConversations from '../sidebar-conversations/read-conversations';
 import UnreadConversations from '../sidebar-conversations/unread-conversations';
 
