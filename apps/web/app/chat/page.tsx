@@ -36,7 +36,7 @@ interface SendMessageOutput {
 	conversations: Conversation[];
 }
 
-async function fetchMessages(
+export async function fetchMessages(
 	conversationSid: string,
 	accessToken: string
 ): Promise<any[]> {
@@ -50,7 +50,7 @@ async function fetchMessages(
 		}
 	);
 	const data = await response.json();
-	return data.messages;
+	return data.data;
 }
 
 async function fetchConversations(

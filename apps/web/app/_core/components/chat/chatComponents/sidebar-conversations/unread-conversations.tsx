@@ -4,23 +4,7 @@ import { useEffect, useState } from 'react';
 import { useConversations } from '@/_core/contexts/conversations-context';
 import type { Message } from '@/_domain/interfaces/message';
 import { useAuth } from '@/_core/contexts/auth-context';
-
-async function fetchMessages(
-	conversationSid: string,
-	accessToken: string
-): Promise<any> {
-	const response = await fetch(
-		`/api/getconversationmessages?conversationSid=${conversationSid}`,
-		{
-			headers: {
-				'x-access-token': accessToken,
-			},
-			cache: 'no-store',
-		}
-	);
-	const data = await response.json();
-	return data.data;
-}
+import { fetchMessages } from '@/chat/page';
 
 export default function UnreadConversations(): JSX.Element {
 	const {
