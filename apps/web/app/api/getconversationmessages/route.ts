@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
 import { NextResponse } from 'next/server';
 import { firebaseAdmin } from '@/_core/firebase/firebase-admin';
 import { getAllByField } from '@/_core/firebase/collection-helpers';
 import { validateFirebaseIdToken } from '@/_core/utils/verify-id-token';
 import type { ApiResponse } from '@/_domain/interfaces/user/user';
 
-// Use named export for HTTP POST method
-export async function GET(req: Request) {
+export async function GET(req: Request): Promise<NextResponse> {
 	try {
 		let response: ApiResponse<any[]>;
 		const auth = firebaseAdmin().auth;
