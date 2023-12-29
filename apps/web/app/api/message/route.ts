@@ -1,24 +1,51 @@
-import { createOne } from '../../_core/firebase/collection-helpers';
+import { NextResponse } from 'next/server';
 import { firebaseAdmin } from '@/_core/firebase/firebase-admin';
+import { getAllByField } from '@/_core/firebase/collection-helpers';
+import { validateFirebaseIdToken } from '@/_core/utils/verify-id-token';
+import type { ApiResponse } from '@/_domain/interfaces/user/user';
 
-export async function POST(req: Request): Promise<any> {
-	const db = firebaseAdmin().firestore;
+export async function GET(req: Request): Promise<NextResponse> {
+	const url = new URL(req.url);
+	const conversationSid = url.searchParams.get('id');
 
-	const formData = await req.formData();
-	const body: Record<string, string> = {};
-	formData.forEach((value, key) => {
-		if (typeof value === 'string') {
-			body[key] = value;
+	try {
+		let response: ApiResponse<any[]>;
+		const auth = firebaseAdmin().auth;
+		await validateFirebaseIdToken(req, auth);
+		const db = firebaseAdmin().firestore;
+
+		if (!conversationSid) {
+			throw new Error('Missing conversationSid');
 		}
-	});
 
-	await createOne(body, db, 'messages');
+		const messagesCollection = db.collection('messages');
 
-	return new Response('Message added', {
-		status: 200,
-	});
-}
+		const result = await getAllByField(
+			conversationSid,
+			'conversationSid',
+			messagesCollection
+		);
 
-export function GET(): any {
-	return 'hello world';
+		if (result?.length) {
+			response = {
+				success: true,
+				message: 'success',
+				data: result.sort((a, b) => parseInt(a.index) - parseInt(b.index)),
+			};
+		} else {
+			response = {
+				success: false,
+				message: 'failure',
+				data: [],
+			};
+		}
+
+		return NextResponse.json(response);
+	} catch (error) {
+		console.error('get conversation messages error', error);
+		return NextResponse.json({
+			status: 'Unexpected error ocurred',
+			error: JSON.stringify(error),
+		});
+	}
 }

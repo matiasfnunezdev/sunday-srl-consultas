@@ -1,5 +1,3 @@
- 
-
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
 
 import { Button } from './ButtonChat';
@@ -61,41 +59,48 @@ export function FooterComponent(props: FooterComponentProps) {
 	const { getAccessToken } = useAuth();
 	const addSnackbar = useSnackbar();
 
-  const { selectedTags, selectedConversation, setSelectedTags, setConversations, setSelectedConversation, setSelectedConversationMessages } = useConversations();
+	const {
+		selectedTags,
+		selectedConversation,
+		setSelectedTags,
+		setConversations,
+		setSelectedConversation,
+		setSelectedConversationMessages,
+	} = useConversations();
 
-  const handleUpdateConversation = async () => {
-    const sid = selectedConversation?.sid;
+	const handleUpdateConversation = async () => {
+		const sid = selectedConversation?.sid;
 
 		if (selectedTags?.length > 0) {
 			if (sid) {
-				setSelectedConversation(null)
-				setSelectedConversationMessages([])
-				setSelectedTags([])
+				setSelectedConversation(null);
+				setSelectedConversationMessages([]);
+				setSelectedTags([]);
 				const accessToken = await getAccessToken();
 				if (accessToken) {
-					await updateConversation(sid, {
-						inProgress: false,
-						unreadMessagesCount: 0,
-						unread: false,
-						closeCase: true,
-						tags: selectedTags
-					}, accessToken);
+					await updateConversation(
+						sid,
+						{
+							inProgress: false,
+							unreadMessagesCount: 0,
+							unread: false,
+							closeCase: true,
+							tags: selectedTags,
+						},
+						accessToken
+					);
 					const conversationsResult = await fetchConversations(accessToken);
 					setConversations(conversationsResult);
 				}
-				
 			}
-		}
-		else {
+		} else {
 			addSnackbar({
 				key: 'warning',
 				text: 'Debes etiquetar el caso antes de cerrarlo',
 				variant: 'warning',
 			});
 		}
-
-    
-  }
+	};
 
 	return (
 		<div className="bg-[#202123] w-full content p-2">
@@ -104,8 +109,8 @@ export function FooterComponent(props: FooterComponentProps) {
 					backgroundColor="[#F2EC4C]"
 					icon={undefined}
 					onClick={() => {
-            void handleUpdateConversation();
-          }}
+						void handleUpdateConversation();
+					}}
 					padding="3"
 					text="CERRAR CASO"
 				/>
@@ -124,14 +129,6 @@ export function FooterComponent(props: FooterComponentProps) {
 					text="RESPONDER"
 				/>
 			</div>
-			{/* <div className="flex flex-col gap-4">
-        <Button backgroundColor="[#F2EC4C]" icon={undefined} padding="3" text="ETIQUETAR" />
-      </div>
-      <div className="flex flex-col gap-4">
-        <button className="px-14 rounded-md bg-[#D9D9D975] cursor-pointer select-none p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-200">
-          DESCARTAR
-        </button>
-      </div> */}
 		</div>
 	);
 }

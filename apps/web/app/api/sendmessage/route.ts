@@ -27,12 +27,8 @@ export async function POST(req: Request) {
 					body: messageResult?.body ?? null,
 					media: messageResult?.media ?? null,
 					participantSid: messageResult?.participantSid ?? null,
-					dateCreated: messageResult?.dateCreated
-						? String(messageResult?.dateCreated)
-						: null,
-					dateUpdated: messageResult?.dateUpdated
-						? String(messageResult?.dateUpdated)
-						: null,
+					dateCreated: new Date().toISOString(),
+					dateUpdated: new Date().toISOString(),
 				},
 				db,
 				'messages'

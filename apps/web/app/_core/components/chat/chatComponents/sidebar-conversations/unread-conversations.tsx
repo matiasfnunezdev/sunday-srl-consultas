@@ -5,17 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useConversations } from '@/_core/contexts/conversations-context';
 import type { Message } from '@/_domain/interfaces/message';
-import { useAuth } from '@/_core/contexts/auth-context';
 
-interface UnreadConversationsProps {
-	handleFetchMessages: (
-		conversationSid: string,
-		accessToken: string
-	) => Promise<any[]>
-}
-
-export default function UnreadConversations(props: UnreadConversationsProps): JSX.Element {
-	const { handleFetchMessages } = props;
+export default function UnreadConversations(): JSX.Element {
 	const {
 		conversations,
 		selectedConversation,
@@ -24,7 +15,6 @@ export default function UnreadConversations(props: UnreadConversationsProps): JS
 		setSelectedConversationMessages,
 		setIsLoading,
 	} = useConversations();
-	const { getAccessToken } = useAuth();
 	const [selectedConversationSid, setSelectedConversationSid] = useState<
 		string | null
 	>(null);
@@ -40,20 +30,13 @@ export default function UnreadConversations(props: UnreadConversationsProps): JS
 		setTimeStamp(new Date().getTime());
 	};
 
-	const handleSelectedConversation = async (sid: string): Promise<void> => {
+	const handleSelectedConversation = (sid: string): void => {
 		try {
 			setIsLoading(true);
-			const accessToken = await getAccessToken();
-			if (accessToken) {
-				const result = await handleFetchMessages(sid, accessToken);
-
-				if (result) {
-					setSelectedConversation({
-						sid,
-						messages: result,
-					});
-				}
-			}
+			setSelectedConversation({
+				sid,
+				messages: [],
+			});
 		} catch {
 			throw new Error('Unexpected error getting messages');
 		} finally {

@@ -4,28 +4,15 @@ import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useConversations } from '@/_core/contexts/conversations-context';
-import type { Message } from '@/_domain/interfaces/message';
-import { useAuth } from '@/_core/contexts/auth-context';
 
-interface ReadConversationsProps {
-	handleFetchMessages: (
-		conversationSid: string,
-		accessToken: string
-	) => Promise<any[]>
-}
-
-export default function ReadConversations(props: ReadConversationsProps): JSX.Element {
-	const { handleFetchMessages } = props;
-
+export default function ReadConversations(): JSX.Element {
 	const {
 		conversations,
-		selectedConversation,
 		isLoading,
 		setSelectedConversation,
 		setSelectedConversationMessages,
 		setIsLoading,
 	} = useConversations();
-	const { getAccessToken } = useAuth();
 	const [selectedConversationSid, setSelectedConversationSid] = useState<
 		string | null
 	>(null);
@@ -41,22 +28,14 @@ export default function ReadConversations(props: ReadConversationsProps): JSX.El
 		setTimeStamp(new Date().getTime());
 	};
 
-	const handleSelectedConversation = async (sid: string): Promise<void> => {
+	const handleSelectedConversation = (sid: string): void => {
 		try {
-			setSelectedConversation(null);
+			setSelectedConversation({
+				sid,
+				messages: [],
+			});
 			setSelectedConversationMessages([]);
 			setIsLoading(true);
-			const accessToken = await getAccessToken();
-			if (accessToken) {
-				const result = await handleFetchMessages(sid, accessToken);
-
-				if (result) {
-					setSelectedConversation({
-						sid,
-						messages: result,
-					});
-				}
-			}
 		} catch {
 			throw new Error('Unexpected error getting messages');
 		} finally {
@@ -75,23 +54,6 @@ export default function ReadConversations(props: ReadConversationsProps): JSX.El
 			handleSelectedConversation(selectedConversationSid);
 		}
 	}, [timeStamp]);
-
-	useEffect(() => {
-		if (selectedConversation?.messages.length) {
-			const messages = selectedConversation.messages.map((message: Message) => {
-				return {
-					index: message.index,
-					role: message.author.includes('whatsapp') ? 'user' : 'assistant',
-					content: message.body,
-					author: message.author,
-					dateCreated: message.dateCreated,
-					media: message.media ?? null,
-				};
-			});
-
-			setSelectedConversationMessages(messages);
-		}
-	}, [selectedConversation]);
 
 	const renderConversations = conversations
 		?.filter((conversation) => !conversation.unread && conversation.inProgress)

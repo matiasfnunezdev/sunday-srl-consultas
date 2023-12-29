@@ -38,15 +38,12 @@ export const AuthProvider: React.FC<AuthContextProvider> = ({ children }) => {
   const getAccessToken = async (): Promise<string | null> => {
     
     const auth = getAuth(firebaseApp);
-    console.log('getAccessToken', auth?.currentUser)
     if (auth?.currentUser) {
       try {
         const token = await auth?.currentUser.getIdToken();
-        console.log('token', token)
         setAccessToken(token);
         return token;
       } catch (error) {
-        console.log('error', error)
         signOutFireabase();
         console.error('Error refreshing token', error);
         return null;
@@ -57,8 +54,6 @@ export const AuthProvider: React.FC<AuthContextProvider> = ({ children }) => {
 
   useEffect(() => {
     const auth = getAuth(firebaseApp);
-
-    console.log('auth', auth);
 
     async function updateAccessToken(authUser: User | null): Promise<void> {
       if (authUser) {
@@ -72,7 +67,6 @@ export const AuthProvider: React.FC<AuthContextProvider> = ({ children }) => {
     }
 
     const unsubscribe = onIdTokenChanged(auth, (authUser) => {
-      console.log('onIdTokenChanged', authUser)
       void updateAccessToken(authUser)
     });
 
@@ -91,7 +85,6 @@ export const AuthProvider: React.FC<AuthContextProvider> = ({ children }) => {
     const auth = getAuth(firebaseApp);
 
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      console.log('onAuthStateChanged', authUser)
       if (authUser) {
         setUser(authUser);
         setIsAuthReady(true);

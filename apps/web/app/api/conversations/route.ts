@@ -28,7 +28,6 @@ export async function GET(req: Request): Promise<NextResponse> {
 
 		return NextResponse.json(response);
 	} catch (error) {
-		console.log('error', error);
 		if (error?.errorInfo?.code === 'auth/argument-error') {
 			return NextResponse.json(
 				{ status: 'Unauthorized access' },

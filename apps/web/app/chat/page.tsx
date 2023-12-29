@@ -28,7 +28,13 @@ import LogOutModal from '@/_core/components/log-out-modal/log-out-modal';
 import { getInitials } from '@/_core/utils/get-initials';
 import InitialsAvatar from '@/_core/components/initials-avatar/initials-avatar';
 import { SubMenuToggleButton } from '@/_core/components/sub-menu-toggle-button/sub-menu-toggle-button';
-import { fetchConversations, fetchMessages, sendMessage, updateConversation } from '@/_core/utils/api-helper';
+import {
+	fetchConversations,
+	sendMessage,
+	updateConversation,
+} from '@/_core/utils/api-helper';
+import useGetMessagesViewModel from '@/_presentation/message/get-messages-view-model';
+import type { Message } from '@/_domain/interfaces/message';
 
 export default function Page(): JSX.Element {
 	const router = useRouter();
@@ -42,13 +48,14 @@ export default function Page(): JSX.Element {
 	const {
 		conversations,
 		selectedConversation,
-		setSelectedConversation,
 		setConversations,
 		selectedConversationMessages,
 		setSelectedConversationMessages,
 		isLoading,
 		setIsLoading,
 	} = useConversations();
+
+	const { getMessages, messages } = useGetMessagesViewModel();
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [updateInfo, setUpdateInfo] = useState<any | null>(null);
@@ -57,14 +64,6 @@ export default function Page(): JSX.Element {
 	const [showLogOutModal, setShowLogOutModal] = useState(false);
 
 	const menuRef = useRef<any>(null);
-
-	const handleFetchMessages = async (
-		conversationSid: string,
-		accessToken: string
-	): Promise<any> =>  {
-		const result = await fetchMessages(conversationSid, accessToken)
-		return result
-	}
 
 	const openMenu = (event: React.MouseEvent): void => {
 		event.stopPropagation();
@@ -90,15 +89,7 @@ export default function Page(): JSX.Element {
 
 				setConversations(conversationsRes);
 
-				const fetchMessagesResult = await fetchMessages(sid, accessToken);
-
-				if (fetchMessagesResult) {
-					setSelectedConversation({
-						sid,
-						messages: fetchMessagesResult,
-					});
-					setSelectedConversationMessages(fetchMessagesResult);
-				}
+				await getMessages(accessToken, sid);
 			}
 		}
 	};
@@ -110,7 +101,18 @@ export default function Page(): JSX.Element {
 		setIsModalOpen(false);
 	};
 
-	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const scrollableSectionRef = useRef<HTMLDivElement>(null);
+
+	const scrollToBottom = (): void => {
+		setTimeout(() => {
+			if (scrollableSectionRef.current) {
+				scrollableSectionRef.current.scrollTop =
+					scrollableSectionRef.current.scrollHeight;
+			} else {
+				console.log('Ref not found');
+			}
+		}, 100);
+	};
 
 	const handleFetchConversationMessages = async (): Promise<void> => {
 		const accessToken = await getAccessToken();
@@ -146,7 +148,6 @@ export default function Page(): JSX.Element {
 			try {
 				setIsLoading(true);
 				const accessToken = await getAccessToken();
-				console.log('accessToken', accessToken);
 				if (accessToken) {
 					const result = await fetchConversations(accessToken);
 
@@ -235,9 +236,24 @@ export default function Page(): JSX.Element {
 	}, []);
 
 	useEffect(() => {
-		if (selectedConversationMessages.length > 0 && messagesEndRef.current) {
-			messagesEndRef.current.scrollIntoView();
+		if (messages?.length) {
+			const mappedMessages = messages.map((message: Message) => {
+				return {
+					index: message.index,
+					role: message.author.includes('whatsapp') ? 'user' : 'assistant',
+					content: message.body,
+					author: message.author,
+					dateCreated: message.dateCreated,
+					media: message.media ?? null,
+				};
+			});
+
+			setSelectedConversationMessages(mappedMessages);
 		}
+	}, [messages]);
+
+	useEffect(() => {
+		scrollToBottom();
 	}, [selectedConversationMessages, conversations]);
 
 	useEffect(() => {
@@ -247,6 +263,7 @@ export default function Page(): JSX.Element {
 			try {
 				const accessToken = await getAccessToken();
 				if (accessToken) {
+					setIsLoading(true);
 					await updateConversation(
 						conversationSId,
 						{
@@ -256,11 +273,14 @@ export default function Page(): JSX.Element {
 						},
 						accessToken
 					);
+					await getMessages(accessToken, conversationSId);
 					const conversationsResult = await fetchConversations(accessToken);
 					setConversations(conversationsResult);
 				}
 			} catch {
 				throw new Error('Unexpected error updating conversation');
+			} finally {
+				setIsLoading(false);
 			}
 		}
 		if (selectedConversation?.sid) {
@@ -276,15 +296,7 @@ export default function Page(): JSX.Element {
 				const accessToken = await getAccessToken();
 
 				if (sid && accessToken) {
-					const result = await fetchMessages(sid, accessToken);
-
-					if (result) {
-						setSelectedConversation({
-							sid,
-							messages: result,
-						});
-						setSelectedConversationMessages(result);
-					}
+					await getMessages(accessToken, sid);
 
 					addSnackbar({
 						key: 'info',
@@ -421,11 +433,13 @@ export default function Page(): JSX.Element {
 							<Loading />
 						</section>
 					) : (
-						<section className="flex-1 overflow-y-auto rounded-lg border border-neutral-600">
+						<section
+							className="flex-1 overflow-y-auto rounded-lg border border-neutral-600"
+							ref={scrollableSectionRef}
+						>
 							{selectedConversationMessages.map((message) => (
 								<ChatMessages key={message.index} message={message} />
 							))}
-							<div ref={messagesEndRef} />
 						</section>
 					)}
 					{selectedConversationMessages.length > 0 && (
@@ -450,7 +464,7 @@ export default function Page(): JSX.Element {
 				<aside className="bg-gray-900 md:block hidden absolute inset-y-0 right-0 transform md:relative md:translate-x-0 transition duration-200 ease-in-out">
 					{/* Sidebar content here */}
 					<div>
-						<SidebarConversations handleFetchMessages={handleFetchMessages} />
+						<SidebarConversations />
 					</div>
 				</aside>
 			</div>
