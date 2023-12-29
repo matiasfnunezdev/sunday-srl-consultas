@@ -4,6 +4,8 @@ import localFont from 'next/font/local';
 import './globals.css';
 import { Providers } from './providers';
 
+export const dynamic = "force-dynamic";
+
 const gothicBold = localFont({
 	src: [
 		{
