@@ -2,11 +2,10 @@
 
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState , use } from 'react';
+import { useEffect, useState } from 'react';
 import { useConversations } from '@/_core/contexts/conversations-context';
 import type { Message } from '@/_domain/interfaces/message';
 import { useAuth } from '@/_core/contexts/auth-context';
-
 
 interface UnreadConversationsProps {
 	handleFetchMessages: (
@@ -46,7 +45,7 @@ export default function UnreadConversations(props: UnreadConversationsProps): JS
 			setIsLoading(true);
 			const accessToken = await getAccessToken();
 			if (accessToken) {
-				const result = use(handleFetchMessages(sid, accessToken));
+				const result = await handleFetchMessages(sid, accessToken);
 
 				if (result) {
 					setSelectedConversation({
