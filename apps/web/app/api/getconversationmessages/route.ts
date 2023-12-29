@@ -6,7 +6,6 @@ import { getAllByField } from '@/_core/firebase/collection-helpers';
 // Use named export for HTTP POST method
 export async function GET(req: Request) {
 	try {
-		firebaseAdmin();
 		const db = firebaseAdmin().firestore;
 		const { searchParams } = new URL(req.url);
 		const conversationSid = searchParams.get('conversationSid');
