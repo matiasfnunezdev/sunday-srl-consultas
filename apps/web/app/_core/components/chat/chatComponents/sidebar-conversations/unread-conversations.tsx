@@ -117,7 +117,7 @@ export default function UnreadConversations(): JSX.Element {
 				type="button"
 			>
 				<div className="flex flex-row justify-start items-center gap-2 text-left">
-					<span>Casos en curso</span>
+					<span>Casos no leidos</span>
 					<span className="flex flex-row justify-center items-center p-1 top-0 right-0 bg-orange-500 rounded-full h-4 w-4 text-xs">
 						{
 							conversations?.filter((conversation) => conversation.unread)
