@@ -295,8 +295,10 @@ export default function Page(): JSX.Element {
 
 				const accessToken = await getAccessToken();
 
-				if (sid && accessToken) {
-					await getMessages(accessToken, sid);
+				if (accessToken) {
+					if (sid) {
+						await getMessages(accessToken, sid);
+					}
 
 					addSnackbar({
 						key: 'info',
@@ -319,7 +321,6 @@ export default function Page(): JSX.Element {
 				const currentTimeStamp = localStorage.getItem('timestamp');
 				if (currentTimeStamp) {
 					const parsedTimeStamp = parseInt(currentTimeStamp);
-
 					if (parsedTimeStamp < updateInfo?.timestamp) {
 						localStorage.setItem('timestamp', updateInfo?.timestamp);
 						void fetchData();

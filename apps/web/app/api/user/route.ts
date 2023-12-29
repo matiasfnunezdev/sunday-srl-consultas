@@ -60,8 +60,8 @@ export async function GET(req: Request): Promise<NextResponse> {
 						{
 							deleted: false,
 							email: firebaseAuthUser.email,
-							displayName: firebaseAuthUser.displayName,
-							mobileNumber: firebaseAuthUser.phoneNumber,
+							displayName: firebaseAuthUser.displayName ?? 'Customer Support',
+							mobileNumber: firebaseAuthUser.phoneNumber ?? null,
 							role: 'user',
 							status: 'active',
 							uid: userId,

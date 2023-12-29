@@ -2,7 +2,6 @@
 
 import { NextResponse } from 'next/server';
 import admin from 'firebase-admin';
-import type { Message } from 'firebase-admin/lib/messaging/messaging-api';
 import { firebaseAdmin } from '@/_core/firebase/firebase-admin';
 import {
 	createOne,
@@ -141,20 +140,6 @@ export async function POST(req: Request) {
 						'cases'
 					);
 				}
-
-				const message = {
-					notification: {
-						title: `test`,
-						body: 'test',
-					},
-					data: {
-						timeStamp: new Date().getTime().toString(),
-					},
-					token:
-						'd7k24IsNA7-ZW-JTvmvbA9:APA91bHmM4QkryCM7JFDiV2nWw3IQqZBBtpg3Ro7tKjdDeluLlFkpG4huxs_Bi2wtCTaVj-ucGp1H5EuSSZIiaZWHw13n08QQk5uphfYGxHI0z3ojHoqijaSSqL8KZMPEwQOD6DhmqPu',
-				} as Message;
-
-				await admin.messaging().send(message);
 
 				const updatesRef = admin.database().ref('updates');
 				const newUpdateRef = updatesRef.push();
