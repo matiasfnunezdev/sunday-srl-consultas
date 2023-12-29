@@ -4,9 +4,16 @@ import { useEffect, useState } from 'react';
 import { useConversations } from '@/_core/contexts/conversations-context';
 import type { Message } from '@/_domain/interfaces/message';
 import { useAuth } from '@/_core/contexts/auth-context';
-import { fetchMessages } from '@/_core/utils/api-helper';
 
-export default function UnreadConversations(): JSX.Element {
+interface UnreadConversationsProps {
+	handleFetchMessages: (
+		conversationSid: string,
+		accessToken: string
+	) => Promise<any[]>
+}
+
+export default function UnreadConversations(props: UnreadConversationsProps): JSX.Element {
+	const { handleFetchMessages } = props;
 	const {
 		conversations,
 		selectedConversation,
@@ -36,7 +43,7 @@ export default function UnreadConversations(): JSX.Element {
 			setIsLoading(true);
 			const accessToken = await getAccessToken();
 			if (accessToken) {
-				const result = await fetchMessages(sid, accessToken);
+				const result = await handleFetchMessages(sid, accessToken);
 
 				if (result) {
 					setSelectedConversation({

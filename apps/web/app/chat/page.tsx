@@ -58,6 +58,14 @@ export default function Page(): JSX.Element {
 
 	const menuRef = useRef<any>(null);
 
+	const handleFetchMessages = async (
+		conversationSid: string,
+		accessToken: string
+	): Promise<any> =>  {
+		const result = await fetchMessages(conversationSid, accessToken)
+		return result
+	}
+
 	const openMenu = (event: React.MouseEvent): void => {
 		event.stopPropagation();
 		setShowUserContextMenu(true);
@@ -442,7 +450,7 @@ export default function Page(): JSX.Element {
 				<aside className="bg-gray-900 md:block hidden absolute inset-y-0 right-0 transform md:relative md:translate-x-0 transition duration-200 ease-in-out">
 					{/* Sidebar content here */}
 					<div>
-						<SidebarConversations />
+						<SidebarConversations handleFetchMessages={handleFetchMessages} />
 					</div>
 				</aside>
 			</div>
