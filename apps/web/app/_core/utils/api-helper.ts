@@ -1,3 +1,4 @@
+import { apiBaseUrl } from '../config/api-config';
 import type { Conversation } from '@/_domain/interfaces/conversation';
 import type { SendMessageResponse } from '@/_domain/interfaces/send-message-response';
 
@@ -11,7 +12,7 @@ export async function fetchMessages(
 	accessToken: string
 ): Promise<any[]> {
 	const response = await fetch(
-		`api/getconversationmessages?conversationSid=${conversationSid}`,
+		`${apiBaseUrl}/getconversationmessages?conversationSid=${conversationSid}`,
 		{
 			headers: {
 				'x-access-token': accessToken,
@@ -26,7 +27,7 @@ export async function fetchMessages(
 export async function fetchConversations(
 	accessToken: string
 ): Promise<Conversation[]> {
-	const res = await fetch('api/conversations', {
+	const res = await fetch(`${apiBaseUrl}/conversations`, {
 		headers: {
 			'x-access-token': accessToken,
 		},
@@ -44,7 +45,7 @@ export async function sendMessage(
 	accessToken: string
 ): Promise<SendMessageOutput> {
 	try {
-		const response = await fetch('api/sendmessage', {
+		const response = await fetch(`${apiBaseUrl}/sendmessage`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -71,7 +72,7 @@ export async function updateConversation(
 	accessToken: string
 ): Promise<any> {
 	try {
-		const response = await fetch('api/update-conversation', {
+		const response = await fetch(`${apiBaseUrl}/update-conversation`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
