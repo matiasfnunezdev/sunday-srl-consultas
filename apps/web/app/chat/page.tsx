@@ -18,9 +18,7 @@ import ChatMessages from '../_core/components/chat/chatComponents/chatMessages';
 import { FooterComponent } from '../_core/components/chat/chatComponents/FooterComponent';
 import { Sidebar } from '../_core/components/chat/chatComponents/sidebar/SideBar';
 import { ModalResponder } from '../_core/components/chat/chatComponents/ResponderModal';
-import type {
-	Conversation,
-} from '../_domain/interfaces/conversation';
+import type { Conversation } from '../_domain/interfaces/conversation';
 import type { SendMessageResponse } from '../_domain/interfaces/send-message-response';
 import { firebaseCloudMessaging } from '../_core/firebase/firebase-messaging';
 import SidebarConversations from '@/_core/components/chat/chatComponents/sidebar/SideBarConversations';
@@ -38,10 +36,16 @@ interface SendMessageOutput {
 	conversations: Conversation[];
 }
 
-async function fetchMessages(conversationSid: string): Promise<any[]> {
+async function fetchMessages(
+	conversationSid: string,
+	accessToken: string
+): Promise<any[]> {
 	const response = await fetch(
 		`api/getconversationmessages?conversationSid=${conversationSid}`,
 		{
+			headers: {
+				'x-access-token': accessToken,
+			},
 			cache: 'no-store',
 		}
 	);
@@ -120,7 +124,12 @@ async function updateConversation(
 
 export default function Page(): JSX.Element {
 	const router = useRouter();
-	const { handleRefetchUserInfo, getAccessToken, userInfo, isAuthReady } = useAuth();
+	const {
+		handleRefetchUserInfo,
+		getAccessToken,
+		userInfo,
+		isAuthReady,
+	} = useAuth();
 	const addSnackbar = useSnackbar();
 	const {
 		conversations,
@@ -165,7 +174,7 @@ export default function Page(): JSX.Element {
 
 				setConversations(conversationsRes);
 
-				const fetchMessagesResult = await fetchMessages(sid);
+				const fetchMessagesResult = await fetchMessages(sid, accessToken);
 
 				if (fetchMessagesResult) {
 					setSelectedConversation({
@@ -221,7 +230,7 @@ export default function Page(): JSX.Element {
 			try {
 				setIsLoading(true);
 				const accessToken = await getAccessToken();
-				console.log('accessToken', accessToken)
+				console.log('accessToken', accessToken);
 				if (accessToken) {
 					const result = await fetchConversations(accessToken);
 
@@ -238,9 +247,8 @@ export default function Page(): JSX.Element {
 
 		if (isAuthReady) {
 			void fetchData();
-		}
-		else {
-			router.push('/')
+		} else {
+			router.push('/');
 		}
 	}, []);
 
@@ -323,15 +331,18 @@ export default function Page(): JSX.Element {
 			try {
 				const accessToken = await getAccessToken();
 				if (accessToken) {
-					await updateConversation(conversationSId, {
-						inProgress: true,
-						unreadMessagesCount: 0,
-						unread: false,
-					}, accessToken);
+					await updateConversation(
+						conversationSId,
+						{
+							inProgress: true,
+							unreadMessagesCount: 0,
+							unread: false,
+						},
+						accessToken
+					);
 					const conversationsResult = await fetchConversations(accessToken);
 					setConversations(conversationsResult);
 				}
-				
 			} catch {
 				throw new Error('Unexpected error updating conversation');
 			}
@@ -346,8 +357,10 @@ export default function Page(): JSX.Element {
 			try {
 				const sid = selectedConversation?.sid;
 
-				if (sid) {
-					const result = await fetchMessages(sid);
+				const accessToken = await getAccessToken();
+
+				if (sid && accessToken) {
+					const result = await fetchMessages(sid, accessToken);
 
 					if (result) {
 						setSelectedConversation({
@@ -362,16 +375,12 @@ export default function Page(): JSX.Element {
 						text: 'Nuevo mensaje recibido',
 						variant: 'info',
 					});
-				}
 
-				const accessToken = await getAccessToken();
-				if (accessToken) {
 					const conversationsResult = await fetchConversations(accessToken);
-				if (conversationsResult?.length) {
-					setConversations(conversationsResult);
+					if (conversationsResult?.length) {
+						setConversations(conversationsResult);
+					}
 				}
-				}
-				
 			} catch (error) {
 				throw new Error('Unexpected error fetching conversations');
 			}
@@ -397,10 +406,12 @@ export default function Page(): JSX.Element {
 
 	const renderFullName = `${userInfo?.displayName}`;
 
-	const fullNameInitials =
-		userInfo?.displayName
-			? getInitials(userInfo.displayName?.split(' ')[0], userInfo.displayName?.split(' ')[1])
-			: undefined;
+	const fullNameInitials = userInfo?.displayName
+		? getInitials(
+				userInfo.displayName?.split(' ')[0],
+				userInfo.displayName?.split(' ')[1]
+		  )
+		: undefined;
 
 	const renderLogOutModal = showLogOutModal ? (
 		<LogOutModal

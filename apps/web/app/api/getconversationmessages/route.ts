@@ -2,15 +2,18 @@
 import { NextResponse } from 'next/server';
 import { firebaseAdmin } from '@/_core/firebase/firebase-admin';
 import { getAllByField } from '@/_core/firebase/collection-helpers';
+import { validateFirebaseIdToken } from '@/_core/utils/verify-id-token';
+import type { ApiResponse } from '@/_domain/interfaces/user/user';
 
 // Use named export for HTTP POST method
 export async function GET(req: Request) {
 	try {
+		let response: ApiResponse<any[]>;
+		const auth = firebaseAdmin().auth;
+		await validateFirebaseIdToken(req, auth);
 		const db = firebaseAdmin().firestore;
 		const { searchParams } = new URL(req.url);
 		const conversationSid = searchParams.get('conversationSid');
-
-		console.info('get conversation messages', conversationSid);
 
 		if (!conversationSid) {
 			throw new Error('Missing conversationSid');
@@ -18,21 +21,27 @@ export async function GET(req: Request) {
 
 		const messagesCollection = db.collection('messages');
 
-		let messages;
-
 		const result = await getAllByField(
 			conversationSid,
 			'conversationSid',
 			messagesCollection
 		);
 
-		if (result) {
-			messages = result.sort((a, b) => parseInt(a.index) - parseInt(b.index));
+		if (result?.length) {
+			response = {
+				success: true,
+				message: 'success',
+				data: result.sort((a, b) => parseInt(a.index) - parseInt(b.index)),
+			};
 		} else {
-			messages = [];
+			response = {
+				success: false,
+				message: 'failure',
+				data: [],
+			};
 		}
 
-		return NextResponse.json({ messages });
+		return NextResponse.json(response);
 	} catch (error) {
 		console.error('get conversation messages error', error);
 		return NextResponse.json({

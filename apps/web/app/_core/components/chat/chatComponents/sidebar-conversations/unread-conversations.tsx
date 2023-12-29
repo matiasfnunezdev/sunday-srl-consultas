@@ -3,13 +3,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useConversations } from '@/_core/contexts/conversations-context';
 import type { Message } from '@/_domain/interfaces/message';
+import { useAuth } from '@/_core/contexts/auth-context';
 
-async function fetchMessages(conversationSid: string): Promise<any> {
+async function fetchMessages(
+	conversationSid: string,
+	accessToken: string
+): Promise<any> {
 	const response = await fetch(
-		`/api/getconversationmessages?conversationSid=${conversationSid}`
+		`/api/getconversationmessages?conversationSid=${conversationSid}`,
+		{
+			headers: {
+				'x-access-token': accessToken,
+			},
+			cache: 'no-store',
+		}
 	);
 	const data = await response.json();
-	return data.messages;
+	return data.data;
 }
 
 export default function UnreadConversations(): JSX.Element {
@@ -21,6 +31,7 @@ export default function UnreadConversations(): JSX.Element {
 		setSelectedConversationMessages,
 		setIsLoading,
 	} = useConversations();
+	const { getAccessToken } = useAuth();
 	const [selectedConversationSid, setSelectedConversationSid] = useState<
 		string | null
 	>(null);
@@ -39,13 +50,16 @@ export default function UnreadConversations(): JSX.Element {
 	const handleSelectedConversation = async (sid: string): Promise<void> => {
 		try {
 			setIsLoading(true);
-			const result = await fetchMessages(sid);
+			const accessToken = await getAccessToken();
+			if (accessToken) {
+				const result = await fetchMessages(sid, accessToken);
 
-			if (result) {
-				setSelectedConversation({
-					sid,
-					messages: result,
-				});
+				if (result) {
+					setSelectedConversation({
+						sid,
+						messages: result,
+					});
+				}
 			}
 		} catch {
 			throw new Error('Unexpected error getting messages');
