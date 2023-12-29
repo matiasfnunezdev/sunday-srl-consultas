@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useConversations } from '@/_core/contexts/conversations-context';
 import type { Message } from '@/_domain/interfaces/message';
 import { useAuth } from '@/_core/contexts/auth-context';
-import { fetchMessages } from '@/chat/page';
+import { fetchMessages } from '@/_core/utils/api-helper';
 
 export default function ReadConversations(): JSX.Element {
 	const {
