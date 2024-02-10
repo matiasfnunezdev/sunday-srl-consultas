@@ -1,19 +1,69 @@
-/* eslint-disable unicorn/filename-case -- description */
+ 
+ 
 /* eslint-disable react/display-name -- description */
 /* eslint-disable @typescript-eslint/naming-convention -- description */
 import type { FC } from 'react';
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
-import type { ChatMessage } from '../../../../_domain/interfaces/message';
+import type { ChatMessage, MediaItem } from '../../../../_domain/interfaces/message';
 import TimeAgo from '../../time-ago/time-ago';
 import { formatPhoneNumber } from '@/_core/utils/format-phone-numer';
+import { fetchMedia } from '@/_core/utils/get-media-helper';
 
 interface Props {
 	message: ChatMessage;
 }
 
 const ChatMessages: FC<Props> = memo(({ message }) => {
+	const [mediaUrls, setMediaUrls] = useState<any[]>();
+	
+	useEffect(() => {
+		console.log('message', message)
+		async function handleFetchMedia(media: MediaItem[]): Promise<void> {
+			try {
+				console.log('message media', message?.media);
+				const mediaPromises = media.map(mediaValue => fetchMedia(mediaValue.Sid));
+	
+				// Use Promise.allSettled to wait for all promises to settle
+				const results = await Promise.allSettled(mediaPromises);
+	
+				// Process results
+				const successfulResults = results.flatMap(result => 
+					result.status === 'fulfilled' ? [result.value] : []
+				);
+	
+				// Optionally, handle errors or rejected promises
+				const errors = results.flatMap(result =>
+					result.status === 'rejected' ? [result.reason] : []
+				);
+	
+				if (errors.length > 0) {
+					console.error('Some media fetches failed:', errors);
+					// Handle errors as needed, e.g., show error messages to the user
+				}
+				
+				console.log('successfulResults', successfulResults)
+	
+				setMediaUrls(successfulResults);
+			} catch (error) {
+				console.log('error', error)
+				console.error('Unexpected error in handleFetchMedia:', JSON.stringify(error));
+			}
+		}
+	
+		if (message?.media?.length) {
+			const parsedMedia: MediaItem[] = JSON.parse(message.media)
+			void handleFetchMedia(parsedMedia);
+		}
+	}, [message?.media]); // Adjust the dependency array as needed
+
+	const renderMedia = mediaUrls?.length ? mediaUrls.map((media) => {
+		const src = media?.links?.content_direct_temporary
+		console.log('src', src)
+		return src ? <img alt="media" className='w-[400px] max-w-[400px]' key={media.sid} src={src} width={100}  /> : null
+	}) : null
+	
 	const renderMessage =
 		message.role === 'user' ? (
 			<div className="relative flex flex-col gap-4 p-4 text-base md:max-w-2xl md:gap-2 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
@@ -27,6 +77,7 @@ const ChatMessages: FC<Props> = memo(({ message }) => {
 					<div className="prose whitespace-pre-wrap prose-invert text-amber-50">
 						{message.content}
 					</div>
+					{renderMedia}
 					<TimeAgo utcTimestamp={message.dateCreated} />
 				</div>
 			</div>
@@ -46,6 +97,7 @@ const ChatMessages: FC<Props> = memo(({ message }) => {
 					<div className="prose whitespace-pre-wrap prose-invert text-amber-50">
 						{message.content}
 					</div>
+					{renderMedia}
 					<TimeAgo utcTimestamp={message.dateCreated} />
 				</div>
 			</div>

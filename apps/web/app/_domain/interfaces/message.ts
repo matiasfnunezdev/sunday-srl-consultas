@@ -7,7 +7,7 @@ export interface MediaItem {
 	size: number;
 	filename: string | null;
 	content_type: string;
-	sid: string;
+	Sid: string;
 }
 
 export interface Message {
@@ -17,7 +17,7 @@ export interface Message {
 	index: number;
 	author: string;
 	body: string;
-	media: MediaItem[] | null;
+	media?: string;
 	attributes: string;
 	participantSid: string | null;
 	dateCreated: string;
@@ -48,5 +48,5 @@ export interface ChatMessage {
 	content: string;
 	author: string;
 	dateCreated: string;
-	media: MediaItem[] | null;
+	media?: string;
 }

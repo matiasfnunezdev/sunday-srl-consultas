@@ -35,15 +35,15 @@ export async function GET(req: Request) {
 		const mediaSid = searchParams.get('mediaSid');
 
 		const accountSid = twillioConfig.accountSId;
-		const accountSecret = accessToken.toJwt();
 		const chatServiceSid = twillioConfig.chatServiceSId;
+		const authToken = twillioConfig.authToken;
 
 		const url = `https://mcs.us1.twilio.com/v1/Services/${chatServiceSid}/Media/${mediaSid}`;
 
 		const response = await axios.get(url, {
 			auth: {
 				username: accountSid,
-				password: accountSecret,
+				password: authToken,
 			},
 		});
 
@@ -53,6 +53,7 @@ export async function GET(req: Request) {
 
 		return NextResponse.json({ status: 'Missing conversationSid' });
 	} catch (error) {
+		console.log('error', error);
 		return NextResponse.json({ status: 'Unexpected error ocurred1' });
 	}
 }

@@ -244,7 +244,7 @@ export default function Page(): JSX.Element {
 					content: message.body,
 					author: message.author,
 					dateCreated: message.dateCreated,
-					media: message.media ?? null,
+					media: message.media,
 				};
 			});
 
@@ -307,6 +307,7 @@ export default function Page(): JSX.Element {
 					});
 
 					const conversationsResult = await fetchConversations(accessToken);
+					console.log('conversationsResult', conversationsResult)
 					if (conversationsResult?.length) {
 						setConversations(conversationsResult);
 					}
