@@ -65,7 +65,7 @@ export default function UnreadConversations(): JSX.Element {
 					content: message.body,
 					author: message.author,
 					dateCreated: message.dateCreated,
-					media: message.media ?? null,
+					media: message.media,
 				};
 			});
 
