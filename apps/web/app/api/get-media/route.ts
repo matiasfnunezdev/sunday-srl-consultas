@@ -54,6 +54,6 @@ export async function GET(req: Request) {
 		return NextResponse.json({ status: 'Missing conversationSid' });
 	} catch (error) {
 		console.log('error', error);
-		return NextResponse.json({ status: 'Unexpected error ocurred1' });
+		return NextResponse.json({ status: error });
 	}
 }
