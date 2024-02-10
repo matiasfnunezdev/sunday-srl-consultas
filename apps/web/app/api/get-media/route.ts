@@ -34,16 +34,16 @@ export async function GET(req: Request) {
 		const { searchParams } = new URL(req.url);
 		const mediaSid = searchParams.get('mediaSid');
 
-		const accountSid = twillioConfig.accountSId;
+		// const accountSid = twillioConfig.accountSId;
+		// const authToken = twillioConfig.authToken;
 		const chatServiceSid = twillioConfig.chatServiceSId;
-		const authToken = twillioConfig.authToken;
 
 		const url = `https://mcs.us1.twilio.com/v1/Services/${chatServiceSid}/Media/${mediaSid}`;
 
 		const response = await axios.get(url, {
 			auth: {
-				username: accountSid,
-				password: authToken,
+				username: 'ACa5fad8f58f5dc07982665568517e8245',
+				password: 'deca3b742e7d951ebe1ae211eaa61d77',
 			},
 		});
 
