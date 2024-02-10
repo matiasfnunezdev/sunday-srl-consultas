@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
 import { NextResponse } from 'next/server';
 import twilio from 'twilio';
 import axios from 'axios';
 import { twillioConfig } from '@/_core/config/twillio-config';
 
 // Use named export for HTTP POST method
-export async function GET(req: Request) {
+export async function GET(req: Request): Promise<NextResponse> {
 	const identity = 'sundaymoneyok';
 	try {
 		if (
@@ -14,7 +13,7 @@ export async function GET(req: Request) {
 			!twillioConfig.apiSecret ||
 			!twillioConfig.chatServiceSId
 		) {
-			throw new Error('Missing env variables');
+			return NextResponse.json({ status: 'Missing conversationSid' });
 		}
 
 		const accessToken = new twilio.jwt.AccessToken(
@@ -47,13 +46,17 @@ export async function GET(req: Request) {
 			},
 		});
 
-		if (response.status === 200) {
-			return NextResponse.json(response.data);
+		if (response.status !== 200) {
+			return NextResponse.json({ status: 'Missing conversationSid' });
 		}
 
-		return NextResponse.json({ status: 'Missing conversationSid' });
+		return NextResponse.json(response.data);
 	} catch (error) {
 		console.log('error', error);
-		return NextResponse.json({ status: error });
+
+		return NextResponse.json(
+			{ status: 'Error fetching media' },
+			{ status: 500 }
+		);
 	}
 }

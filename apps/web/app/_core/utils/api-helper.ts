@@ -92,3 +92,20 @@ export async function updateConversation(
 		throw new Error('Failed to send message');
 	}
 }
+
+export async function fetchMedia(mediaSid: string): Promise<any> {
+	try {
+		const res = await fetch(`${apiBaseUrl}/get-media?mediaSid=${mediaSid}`, {
+			cache: 'no-store',
+		});
+
+		if (!res.ok) {
+			throw new Error(`HTTP error! status: ${res.status}`);
+		}
+
+		const data: any = await res.json();
+		return data;
+	} catch (error) {
+		throw new Error(`Failed to fetch media: ${JSON.stringify(error)}`);
+	}
+}

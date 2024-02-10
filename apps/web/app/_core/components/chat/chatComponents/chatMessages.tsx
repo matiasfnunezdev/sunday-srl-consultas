@@ -9,7 +9,7 @@ import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import type { ChatMessage, MediaItem } from '../../../../_domain/interfaces/message';
 import TimeAgo from '../../time-ago/time-ago';
 import { formatPhoneNumber } from '@/_core/utils/format-phone-numer';
-import { fetchMedia } from '@/_core/utils/get-media-helper';
+import { fetchMedia } from '@/_core/utils/api-helper';
 
 interface Props {
 	message: ChatMessage;
