@@ -23,7 +23,28 @@ export default function GetMessagesViewModel(): GetMessagesViewModelResponse {
 			const response = await UseCase.invoke(accessToken, id);
 
 			if (response.success) {
-				setMessages(response.data);
+				setMessages(
+					response.data.map((message) => {
+						const media = message?.media;
+
+						if (media) {
+							const mediaIsString = typeof media === 'string';
+							const parsedMedia = mediaIsString ? JSON.parse(media) : media;
+							return {
+								...message,
+								media: parsedMedia?.map((m) => {
+									return {
+										...m,
+										content_type: m?.ContentType ?? m?.content_type,
+										Sid: m?.Sid ?? m?.sid,
+									};
+								}),
+							};
+						}
+
+						return message;
+					})
+				);
 			} else {
 				setError('Get tag: Error getting tag.');
 			}

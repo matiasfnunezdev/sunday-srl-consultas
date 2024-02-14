@@ -26,7 +26,11 @@ export async function sendMessageToConversation(
 
 		await client.conversations.v1
 			.conversations(conversationSid)
-			.messages.create({ body: message, author: 'Customer Support' })
+			.messages.create({
+				body: message,
+				author: 'Customer Support',
+				mediaSid: 'ME63943edfeba7b0c4e067e0a5f7a0a35a',
+			})
 			.then((msg) => {
 				result = msg;
 			});

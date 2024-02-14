@@ -1,6 +1,8 @@
-/* eslint-disable unicorn/filename-case -- description */
+ 
 /* eslint-disable @typescript-eslint/no-confusing-void-expression -- description */
 import { useState } from 'react';
+import { faUpload } from '@fortawesome/free-solid-svg-icons';
+import { Button } from './ButtonChat';
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- description */
 export function ModalResponder({ show, onClose, onSend }) {
@@ -36,6 +38,17 @@ export function ModalResponder({ show, onClose, onSend }) {
             value={message}
           />
           <div className="flex justify-end space-x-2 mt-4">
+          <Button
+							backgroundColor="[#2b2c34]"
+							hoverColor='#40414E'
+							icon={faUpload}
+							onClick={() => {
+								console.log('TODO: Implement')
+							}}
+							padding="3"
+							text='Adjuntar archivo'
+							textColor='white'
+						/>
             <button
               className="py-2 px-4 bg-[#404040] text-white rounded hover:bg-[#555759]"
               onClick={onClose}

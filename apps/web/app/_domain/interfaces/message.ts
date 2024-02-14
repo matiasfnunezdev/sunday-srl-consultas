@@ -17,7 +17,7 @@ export interface Message {
 	index: number;
 	author: string;
 	body: string;
-	media?: string;
+	media: MediaItem[] | null;
 	attributes: string;
 	participantSid: string | null;
 	dateCreated: string;
@@ -48,5 +48,5 @@ export interface ChatMessage {
 	content: string;
 	author: string;
 	dateCreated: string;
-	media?: string;
+	media: MediaItem[] | null;
 }

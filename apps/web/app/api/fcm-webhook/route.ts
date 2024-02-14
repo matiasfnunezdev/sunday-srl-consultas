@@ -61,7 +61,7 @@ export async function POST(req: Request) {
 						index: event?.Index ?? null,
 						author: event?.Author ?? null,
 						body: messageBody,
-						media: event?.Media ?? null,
+						media: event?.Media ? JSON.stringify(event.Media) : null,
 						participantSid: event?.ParticipantSid ?? null,
 						dateCreated: event?.DateCreated ? String(event?.DateCreated) : null,
 						dateUpdated: event?.DateUpdated ? String(event?.DateUpdated) : null,
