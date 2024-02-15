@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars -- N/A */
 /* eslint-disable func-names -- N/A */
 
 /* eslint-disable @typescript-eslint/no-confusing-void-expression -- description */
