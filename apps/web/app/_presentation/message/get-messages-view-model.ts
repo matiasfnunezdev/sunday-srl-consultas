@@ -22,23 +22,39 @@ export default function GetMessagesViewModel(): GetMessagesViewModelResponse {
 
 			const response = await UseCase.invoke(accessToken, id);
 
+			console.log('response', response);
+
 			if (response.success) {
 				setMessages(
 					response.data.map((message) => {
 						const media = message?.media;
+						if (typeof media === 'string') {
+							// Clean and parse the media string
+							const cleanJson = media
+								.replace(/^"|"$/g, '') // Remove the leading and trailing double quotes
+								.replace(/\\\\"/g, '"') // Unescape double-escaped quotes
+								.replace(/\\"/g, '"') // Unescape single-escaped quotes
+								.replace(/\\\\/g, '\\'); // Unescape backslashes
+							let parsedMedia;
+							try {
+								parsedMedia = JSON.parse(cleanJson);
+							} catch (e) {
+								console.error('Error parsing media:', error);
+								parsedMedia = []; // Default to an empty array in case of error
+							}
 
-						if (media) {
-							const mediaIsString = typeof media === 'string';
-							const parsedMedia = mediaIsString ? JSON.parse(media) : media;
+							// Ensure parsedMedia is an array
+							if (!Array.isArray(parsedMedia)) {
+								parsedMedia = [parsedMedia];
+							}
+
 							return {
 								...message,
-								media: parsedMedia?.map((m) => {
-									return {
-										...m,
-										content_type: m?.ContentType ?? m?.content_type,
-										Sid: m?.Sid ?? m?.sid,
-									};
-								}),
+								media: parsedMedia.map((m) => ({
+									...m,
+									content_type: m?.ContentType ?? m?.content_type,
+									Sid: m?.Sid ?? m?.sid,
+								})),
 							};
 						}
 
@@ -48,9 +64,9 @@ export default function GetMessagesViewModel(): GetMessagesViewModelResponse {
 			} else {
 				setError('Get tag: Error getting tag.');
 			}
-		} catch {
-			setError('Get tag: Unexpected Error getting tago.');
-			throw new Error('An unexpected error ocurred.');
+		} catch (e) {
+			setError('Get tag: Unexpected Error getting tag.');
+			console.error('getMessages error: ', e);
 		} finally {
 			setLoading(false);
 		}

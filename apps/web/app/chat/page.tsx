@@ -277,8 +277,9 @@ export default function Page(): JSX.Element {
 					const conversationsResult = await fetchConversations(accessToken);
 					setConversations(conversationsResult);
 				}
-			} catch {
-				throw new Error('Unexpected error updating conversation');
+			} catch(error) {
+				console.log('error', error)
+				console.error('setSelectedConversationAsRead error: ', error)
 			} finally {
 				setIsLoading(false);
 			}

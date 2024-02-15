@@ -89,7 +89,8 @@ export async function updateConversation(
 		const conversations = await fetchConversations(accessToken);
 		return { sendMessageRes, conversations };
 	} catch (error) {
-		throw new Error('Failed to send message');
+		console.log('error1', error);
+		console.error('fetchConversations error: ', error);
 	}
 }
 

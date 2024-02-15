@@ -27,7 +27,7 @@ const ChatMessages: FC<Props> = memo(({ message }) => {
 			try {
 				console.log('message media', message?.media);
 				const mediaPromises = media.map((mediaValue) =>
-					fetchMedia(mediaValue.Sid)
+					fetchMedia(mediaValue.Sid ?? mediaValue.sid)
 				);
 
 				// Use Promise.allSettled to wait for all promises to settle
@@ -89,7 +89,7 @@ const ChatMessages: FC<Props> = memo(({ message }) => {
 							backgroundColor="[#2b2c34]"
 							hoverColor='#40414E'
 							icon={faArrowDown}
-							key={media?.Sid}
+							key={media?.Sid ?? media?.sid}
 							onClick={() => {
 								window.open(src, '_blank')
 							}}

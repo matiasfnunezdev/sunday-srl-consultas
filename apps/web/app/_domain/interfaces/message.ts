@@ -8,6 +8,7 @@ export interface MediaItem {
 	filename: string | null;
 	content_type: string;
 	Sid: string;
+	sid: string;
 }
 
 export interface Message {
