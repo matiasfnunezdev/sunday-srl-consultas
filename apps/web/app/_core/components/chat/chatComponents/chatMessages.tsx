@@ -22,10 +22,8 @@ const ChatMessages: FC<Props> = memo(({ message }) => {
 	const [mediaUrls, setMediaUrls] = useState<any[]>();
 
 	useEffect(() => {
-		console.log('message', message);
 		async function handleFetchMedia(media: MediaItem[]): Promise<void> {
 			try {
-				console.log('message media', message?.media);
 				const mediaPromises = media.map((mediaValue) =>
 					fetchMedia(mediaValue.Sid ?? mediaValue.sid)
 				);
@@ -48,8 +46,6 @@ const ChatMessages: FC<Props> = memo(({ message }) => {
 					// Handle errors as needed, e.g., show error messages to the user
 				}
 
-				console.log('successfulResults', successfulResults);
-
 				setMediaUrls(successfulResults);
 			} catch (error) {
 				console.log('error', error);
@@ -68,7 +64,6 @@ const ChatMessages: FC<Props> = memo(({ message }) => {
 
 	const renderMedia = mediaUrls?.length
 		? mediaUrls.map((media): React.JSX.Element | null | undefined => {
-				console.log('media', media);
 				const src = media?.links?.content_direct_temporary;
 				const contentType = media?.content_type?.split('/')?.[1];
 
@@ -87,30 +82,31 @@ const ChatMessages: FC<Props> = memo(({ message }) => {
 					return (
 						<Button
 							backgroundColor="[#2b2c34]"
-							hoverColor='#40414E'
+							hoverColor="#40414E"
 							icon={faArrowDown}
 							key={media?.Sid ?? media?.sid}
 							onClick={() => {
-								window.open(src, '_blank')
+								window.open(src, '_blank');
 							}}
 							padding="3"
 							text={media?.filename}
-							textColor='white'
+							textColor="white"
 						/>
 					);
 				}
 
-				return null
+				return null;
 		  })
 		: null;
 
 	const renderMessage =
 		message.role === 'user' ? (
 			<div className="relative flex flex-col gap-4 p-4 text-base md:max-w-2xl md:gap-2 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
-				<div className="flex flex-row justify-between items-center gap-2 text-right font-bold">
+				<div className="flex flex-row justify-start items-center gap-1 text-right font-bold">
 					<FontAwesomeIcon icon={faWhatsapp} size="lg" />
 					<span className="text-xs text-gray-400">
-						{formatPhoneNumber(message.author.split('+')[1])}
+						{message?.fullName ??
+							formatPhoneNumber(message.author.split('+')[1])}
 					</span>
 				</div>
 				<div className="prose mt-[-2px] w-full prose-invert">

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression -- N/A */
 import React, { useEffect, useState, useRef } from 'react';
 import Select from 'react-select';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faX } from '@fortawesome/free-solid-svg-icons';
 import { useConversations } from '@/_core/contexts/conversations-context';
 import { useAuth } from '@/_core/contexts/auth-context';
 import useGetTagsViewModel from '@/_presentation/tag/get-tags-view-model';
@@ -148,13 +150,13 @@ export default function TagsModal(props: TagsModalProps): JSX.Element {
 		}),
 		multiValueRemove: (base) => ({
 			...base,
-			color: "#fff",
-			backgroundColor: "transparent",
+			color: '#fff',
+			backgroundColor: 'transparent',
 			borderRadius: 0,
-			"&:hover": {
-				backgroundColor: "transparent",
-				color: "#F2EC4C"
-			}
+			'&:hover': {
+				backgroundColor: 'transparent',
+				color: '#F2EC4C',
+			},
 		}),
 		//Darle un alto al contenedor de las opciones para que no se vean todas las opciones al mismo tiempo
 		menuList: (provided: any) => ({
@@ -212,12 +214,7 @@ export default function TagsModal(props: TagsModalProps): JSX.Element {
 									onClick={handleClose}
 									type="button"
 								>
-									<i
-										className="fa-sharp fa-regular fa-xmark"
-										style={{
-											fontSize: 24,
-										}}
-									/>
+									<FontAwesomeIcon icon={faX} />
 								</button>
 							</div>
 						</div>

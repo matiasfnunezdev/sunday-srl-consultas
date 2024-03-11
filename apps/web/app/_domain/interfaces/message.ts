@@ -50,4 +50,5 @@ export interface ChatMessage {
 	author: string;
 	dateCreated: string;
 	media: MediaItem[] | null;
+	fullName?: string;
 }

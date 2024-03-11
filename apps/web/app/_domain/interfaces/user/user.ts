@@ -1,7 +1,10 @@
+import type { PagesData } from '../pagination/pagination';
+
 export interface ApiResponse<T> {
 	success: boolean;
 	message: string;
 	data: T;
+	pagesData?: PagesData;
 }
 
 export interface UserData {

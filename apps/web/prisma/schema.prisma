@@ -1,0 +1,912 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model activities {
+  deleted                                 Boolean     @default(false)
+  active                                  Boolean     @default(true)
+  activity_id                             Int         @id @default(autoincrement())
+  name                                    String      @db.VarChar(255)
+  created_at                              DateTime?   @db.DateTime(0)
+  created_user_id                         Int?
+  updated_at                              DateTime?   @db.DateTime(0)
+  updated_user_id                         Int?
+  users_activities_created_user_idTousers users?      @relation("activities_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "activites_users_ibfk1")
+  users_activities_updated_user_idTousers users?      @relation("activities_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "activites_users_ibfk2")
+  customers                               customers[]
+
+  @@index([created_user_id], map: "created_user_id")
+  @@index([updated_user_id], map: "updated_user_id")
+}
+
+model api_keys {
+  deleted                               Boolean   @default(false)
+  active                                Boolean   @default(true)
+  api_key_id                            Int       @id @default(autoincrement())
+  key                                   String    @db.VarChar(255)
+  created_at                            DateTime? @db.DateTime(0)
+  created_user_id                       Int?
+  updated_at                            DateTime? @db.DateTime(0)
+  updated_user_id                       Int?
+  users_api_keys_created_user_idTousers users?    @relation("api_keys_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "api_keys_ibfk_1")
+  users_api_keys_updated_user_idTousers users?    @relation("api_keys_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "api_keys_ibfk_2")
+
+  @@index([key(length: 191)], map: "code")
+  @@index([created_user_id], map: "created_user_id")
+  @@index([updated_user_id], map: "updated_user_id")
+}
+
+model banks {
+  deleted                            Boolean     @default(false)
+  active                             Boolean     @default(true)
+  bank_id                            Int         @id @default(autoincrement())
+  name                               String      @db.VarChar(255)
+  created_at                         DateTime?   @db.DateTime(0)
+  created_user_id                    Int?
+  updated_at                         DateTime?   @db.DateTime(0)
+  updated_user_id                    Int?
+  users_banks_created_user_idTousers users?      @relation("banks_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "banks_ibfk_1")
+  users_banks_updated_user_idTousers users?      @relation("banks_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "banks_ibfk_2")
+  customers                          customers[]
+  loans                              loans[]
+
+  @@index([created_user_id], map: "created_user_id")
+  @@index([updated_user_id], map: "updated_user_id")
+}
+
+model cities {
+  deleted   Boolean     @default(false)
+  city_id   Int         @id @default(autoincrement())
+  state_id  Int
+  name      String      @db.VarChar(255)
+  states    states      @relation(fields: [state_id], references: [state_id], onDelete: NoAction, onUpdate: NoAction, map: "cities_ibfk_1")
+  customers customers[]
+
+  @@index([state_id], map: "state_id")
+}
+
+model configuration_parameters {
+  deleted                                               Boolean        @default(false)
+  active                                                Boolean        @default(true)
+  configuration_parameter_id                            Int            @id @default(autoincrement())
+  configuration_id                                      Int
+  name                                                  String?        @db.VarChar(255)
+  description                                           String         @db.VarChar(200)
+  value                                                 String?        @db.VarChar(255)
+  type                                                  String?        @db.VarChar(255)
+  created_at                                            DateTime?      @db.DateTime(0)
+  created_user_id                                       Int
+  updated_at                                            DateTime?      @db.DateTime(0)
+  updated_user_id                                       Int?
+  configurations                                        configurations @relation(fields: [configuration_id], references: [configuration_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_parameters_configurationid")
+  users_configuration_parameters_created_user_idTousers users          @relation("configuration_parameters_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_parameters_createduserid")
+  users_configuration_parameters_updated_user_idTousers users?         @relation("configuration_parameters_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_parameters_updateduserid")
+
+  @@index([configuration_id], map: "fk_parameters_configurationid")
+  @@index([created_user_id], map: "fk_parameters_createduserid")
+  @@index([updated_user_id], map: "fk_parameters_updateduserid")
+}
+
+model configurations {
+  deleted                                     Boolean                    @default(false)
+  configuration_id                            Int                        @id @default(autoincrement())
+  name                                        String?                    @db.VarChar(255)
+  created_at                                  DateTime?                  @db.DateTime(0)
+  created_user_id                             Int
+  updated_at                                  DateTime?                  @db.DateTime(0)
+  updated_user_id                             Int?
+  configuration_parameters                    configuration_parameters[]
+  users_configurations_created_user_idTousers users                      @relation("configurations_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_createduserid")
+  users_configurations_updated_user_idTousers users?                     @relation("configurations_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_updateduserid")
+
+  @@index([created_user_id], map: "fk_createduserid")
+  @@index([updated_user_id], map: "fk_updateduserid")
+}
+
+model content_type {
+  deleted         Boolean    @default(false)
+  content_type_id Int        @id @default(autoincrement())
+  name            String?    @db.VarChar(255)
+  created_at      DateTime?  @db.DateTime(0)
+  updated_at      DateTime?  @db.DateTime(0)
+  contents        contents[]
+}
+
+model contents {
+  deleted         Boolean      @default(false)
+  content_id      Int          @id @default(autoincrement())
+  content_type_id Int
+  body            String       @db.LongText
+  created_at      DateTime?    @db.DateTime(0)
+  updated_at      DateTime?    @db.DateTime(0)
+  content_type    content_type @relation(fields: [content_type_id], references: [content_type_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_content_type_id")
+
+  @@index([content_type_id], map: "fk_content_type_id")
+}
+
+model countries {
+  deleted    Boolean     @default(false)
+  country_id Int         @id @default(autoincrement())
+  name       String      @db.VarChar(255)
+  code2      String      @db.VarChar(2)
+  code3      String      @db.VarChar(3)
+  latitude   Decimal?    @db.Decimal(11, 8)
+  longitude  Decimal?    @db.Decimal(11, 8)
+  customers  customers[]
+  states     states[]
+}
+
+model customer_attachments {
+  deleted                Boolean          @default(false)
+  customer_attachment_id Int              @id @default(autoincrement())
+  customer_id            Int
+  module_document_id     Int
+  file_id                Int
+  created_at             DateTime?        @db.DateTime(0)
+  created_user_id        Int?
+  customers              customers        @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_customerdoc_customerid")
+  files                  files            @relation(fields: [file_id], references: [file_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_customerdoc_documentid")
+  module_documents       module_documents @relation(fields: [module_document_id], references: [module_document_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_customerdoc_modofix")
+
+  @@index([customer_id], map: "fk_customerdoc_customerid")
+  @@index([file_id], map: "fk_customerdoc_documentid")
+  @@index([module_document_id], map: "fk_customerdoc_modofix")
+}
+
+model customer_nosis_reports {
+  deleted                     Boolean                       @default(false)
+  customer_nosis_report_id    Int                           @id @default(autoincrement())
+  stamp                       DateTime                      @db.DateTime(0)
+  customer_id                 Int
+  transaction_code            String?                       @db.VarChar(125)
+  reference                   String?                       @db.VarChar(125)
+  server                      String?                       @db.VarChar(125)
+  version                     String?                       @db.VarChar(125)
+  base_url                    String?                       @db.VarChar(125)
+  request                     String?                       @db.LongText
+  response                    String?                       @db.LongText
+  created_at                  DateTime?                     @db.DateTime(0)
+  created_user_id             Int?
+  users                       users?                        @relation(fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_createduserid_nosissidx")
+  customers                   customers                     @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_customer_nosissidx")
+  loan_customer_nosis_reports loan_customer_nosis_reports[]
+
+  @@index([created_user_id], map: "fk_createduserid_nosissidx")
+  @@index([customer_id], map: "fk_customer_nosissidx")
+}
+
+model customers {
+  deleted                                Boolean                  @default(false)
+  customer_id                            Int                      @id @default(autoincrement())
+  user_id                                Int
+  first_name                             String                   @db.VarChar(255)
+  last_name                              String                   @db.VarChar(255)
+  gender_id                              Int
+  date_birth                             DateTime                 @db.Date
+  personal_id                            String                   @db.VarChar(255)
+  business_id                            String                   @db.VarChar(255)
+  activity_id                            Int
+  income_id                              Int
+  bank_id                                Int
+  account_number                         String                   @db.VarChar(125)
+  country_id                             Int
+  state_id                               Int
+  city_id                                Int
+  address                                String?                  @db.VarChar(255)
+  mobile_number                          String?                  @db.VarChar(255)
+  phone_number                           String?                  @db.VarChar(255)
+  created_at                             DateTime?                @db.DateTime(0)
+  created_user_id                        Int?
+  updated_at                             DateTime?                @db.DateTime(0)
+  updated_user_id                        Int?
+  customer_attachments                   customer_attachments[]
+  customer_nosis_reports                 customer_nosis_reports[]
+  incomes                                incomes                  @relation(fields: [income_id], references: [income_id], onDelete: NoAction, onUpdate: NoAction, map: "customers_ibfk_1")
+  activities                             activities               @relation(fields: [activity_id], references: [activity_id], onDelete: NoAction, onUpdate: NoAction, map: "customers_ibfk_2")
+  users_customers_user_idTousers         users                    @relation("customers_user_idTousers", fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "customers_ibfk_3")
+  genders                                genders                  @relation(fields: [gender_id], references: [gender_id], onDelete: NoAction, onUpdate: NoAction, map: "customers_ibfk_4")
+  users_customers_created_user_idTousers users?                   @relation("customers_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "customers_users_ibfk1")
+  users_customers_updated_user_idTousers users?                   @relation("customers_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "customers_users_ibfk2")
+  banks                                  banks                    @relation(fields: [bank_id], references: [bank_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_bankcustomeridx")
+  cities                                 cities                   @relation(fields: [city_id], references: [city_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_citycustomer")
+  countries                              countries                @relation(fields: [country_id], references: [country_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_countrycustomer")
+  states                                 states                   @relation(fields: [state_id], references: [state_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_statecustomer")
+  loans                                  loans[]
+
+  @@index([activity_id], map: "activity_id")
+  @@index([created_user_id], map: "created_user_id")
+  @@index([bank_id], map: "fk_bankcustomeridx")
+  @@index([city_id], map: "fk_citycustomer")
+  @@index([country_id], map: "fk_countrycustomer")
+  @@index([state_id], map: "fk_statecustomer")
+  @@index([gender_id], map: "gender_id")
+  @@index([income_id], map: "income_id")
+  @@index([updated_user_id], map: "updated_user_id")
+  @@index([user_id], map: "user_id")
+}
+
+model faqs {
+  deleted    Boolean   @default(false)
+  faq_id     Int       @id @default(autoincrement())
+  active     Boolean   @default(true)
+  question   String?   @db.LongText
+  answer     String?   @db.LongText
+  created_at DateTime? @db.DateTime(0)
+  updated_at DateTime? @db.DateTime(0)
+}
+
+model fcm_tokens {
+  deleted      Boolean @default(false)
+  fcm_token_id Int     @id @default(autoincrement())
+  user_id      Int
+  token        String? @db.LongText
+  users        users   @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_fcm_token_user")
+
+  @@index([user_id], map: "fk_fcm_token_user")
+}
+
+model file_types {
+  file_type_id Int     @id @default(autoincrement())
+  name         String  @db.VarChar(255)
+  code         String? @db.VarChar(255)
+  files        files[]
+}
+
+model files {
+  deleted                            Boolean
+  file_id                            Int                         @id @default(autoincrement())
+  file_type_id                       Int?
+  mime_type                          String                      @db.VarChar(255)
+  file_name                          String?                     @db.VarChar(255)
+  directory                          String?                     @db.VarChar(255)
+  created_at                         DateTime?                   @db.DateTime(0)
+  created_user_id                    Int?
+  updated_at                         DateTime?                   @db.DateTime(0)
+  updated_user_id                    Int?
+  customer_attachments               customer_attachments[]
+  file_types                         file_types?                 @relation(fields: [file_type_id], references: [file_type_id], onDelete: NoAction, onUpdate: NoAction, map: "files_ibfk_1")
+  users_files_created_user_idTousers users?                      @relation("files_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "files_users_ibfk1")
+  users_files_updated_user_idTousers users?                      @relation("files_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "files_users_ibfk2")
+  loan_contracts                     loan_contracts[]
+  loan_installment_invoices          loan_installment_invoices[]
+  loan_payment_charge_files          loan_payment_charge_files[]
+
+  @@index([created_user_id], map: "created_user_id")
+  @@index([file_type_id], map: "file_type_id")
+  @@index([updated_user_id], map: "updated_user_id")
+}
+
+model genders {
+  gender_id Int         @id @default(autoincrement())
+  name      String      @db.VarChar(255)
+  customers customers[]
+}
+
+model incomes {
+  deleted                              Boolean     @default(false)
+  active                               Boolean     @default(true)
+  income_id                            Int         @id @default(autoincrement())
+  name                                 String      @db.VarChar(255)
+  min_income                           Decimal     @db.Decimal(10, 2)
+  max_income                           Decimal     @db.Decimal(10, 2)
+  max_loan                             Decimal     @db.Decimal(10, 2)
+  created_at                           DateTime?   @db.DateTime(0)
+  created_user_id                      Int?
+  updated_at                           DateTime?   @db.DateTime(0)
+  updated_user_id                      Int?
+  customers                            customers[]
+  users_incomes_created_user_idTousers users?      @relation("incomes_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "incomes_ibfk_1")
+  users_incomes_updated_user_idTousers users?      @relation("incomes_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "incomes_ibfk_2")
+
+  @@index([created_user_id], map: "created_user_id")
+  @@index([updated_user_id], map: "updated_user_id")
+}
+
+model interest_rates {
+  deleted                                     Boolean   @default(false)
+  active                                      Boolean   @default(true)
+  interest_rate_id                            Int       @id @default(autoincrement())
+  name                                        String    @db.VarChar(255)
+  description                                 String?   @db.VarChar(255)
+  nominal_rate                                Decimal   @db.Decimal(14, 4)
+  expenses_rate                               Decimal   @db.Decimal(14, 4)
+  installments                                Int
+  created_at                                  DateTime? @db.DateTime(0)
+  created_user_id                             Int?
+  updated_at                                  DateTime? @db.DateTime(0)
+  updated_user_id                             Int?
+  users_interest_rates_created_user_idTousers users?    @relation("interest_rates_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "interest_rates_ibfk_1")
+  users_interest_rates_updated_user_idTousers users?    @relation("interest_rates_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "interest_rates_ibfk_2")
+  loans                                       loans[]
+
+  @@index([created_user_id], map: "created_user_id")
+  @@index([updated_user_id], map: "updated_user_id")
+}
+
+model loan_contracts {
+  deleted                                     Boolean   @default(false)
+  loan_contract_id                            Int       @id @default(autoincrement())
+  loan_id                                     Int
+  file_id                                     Int
+  created_at                                  DateTime  @db.DateTime(0)
+  created_user_id                             Int
+  updated_at                                  DateTime? @db.DateTime(0)
+  updated_user_id                             Int?
+  users_loan_contracts_created_user_idTousers users     @relation("loan_contracts_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loans_contracts_createduser")
+  files                                       files     @relation(fields: [file_id], references: [file_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loans_contracts_file")
+  users_loan_contracts_updated_user_idTousers users?    @relation("loan_contracts_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loans_contracts_updateduser")
+  loans                                       loans     @relation(fields: [loan_id], references: [loan_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loans_contractsloan")
+
+  @@index([created_user_id], map: "fk_loans_contracts_createduser")
+  @@index([file_id], map: "fk_loans_contracts_file")
+  @@index([updated_user_id], map: "fk_loans_contracts_updateduser")
+  @@index([loan_id], map: "fk_loans_contractsloan")
+}
+
+model loan_customer_nosis_reports {
+  deleted                       Boolean                @default(false)
+  loan_customer_nosis_report_id Int                    @id @default(autoincrement())
+  loan_id                       Int
+  customer_nosis_report_id      Int
+  created_at                    DateTime?              @db.DateTime(0)
+  created_user_id               Int?
+  loans                         loans                  @relation(fields: [loan_id], references: [loan_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_associatedloandix")
+  customer_nosis_reports        customer_nosis_reports @relation(fields: [customer_nosis_report_id], references: [customer_nosis_report_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loanassociatednoreportidx")
+  users                         users?                 @relation(fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loanassociateduseridx")
+
+  @@index([loan_id], map: "fk_associatedloandix")
+  @@index([customer_nosis_report_id], map: "fk_loanassociatednoreportidx")
+  @@index([created_user_id], map: "fk_loanassociateduseridx")
+}
+
+model loan_expiration_cycles {
+  deleted                                             Boolean   @default(false)
+  loan_expiration_cycle_id                            Int       @id @default(autoincrement())
+  active                                              Boolean   @default(true)
+  name                                                String    @db.VarChar(50)
+  day_from                                            Int
+  day_to                                              Int
+  created_at                                          DateTime  @db.DateTime(0)
+  created_user_id                                     Int
+  updated_at                                          DateTime? @db.DateTime(0)
+  updated_user_id                                     Int?
+  users_loan_expiration_cycles_created_user_idTousers users     @relation("loan_expiration_cycles_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_createduserexpirationcycle")
+  users_loan_expiration_cycles_updated_user_idTousers users?    @relation("loan_expiration_cycles_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_updateduserexpirationcycle")
+  loans                                               loans[]
+
+  @@index([created_user_id], map: "fk_createduserexpirationcycle")
+  @@index([updated_user_id], map: "fk_updateduserexpirationcycle")
+}
+
+model loan_files {
+  deleted                                 Boolean
+  loan_file_id                            Int       @id @default(autoincrement())
+  loan_id                                 Int
+  created_at                              DateTime? @db.DateTime(0)
+  created_user_id                         Int?
+  updated_at                              DateTime? @db.DateTime(0)
+  updated_user_id                         Int?
+  loans                                   loans     @relation(fields: [loan_id], references: [loan_id], onDelete: NoAction, onUpdate: NoAction, map: "loan_files_ibfk_1")
+  users_loan_files_created_user_idTousers users?    @relation("loan_files_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "loan_files_users_ibfk1")
+  users_loan_files_updated_user_idTousers users?    @relation("loan_files_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "loan_files_users_ibfk2")
+
+  @@index([created_user_id], map: "created_user_id")
+  @@index([loan_id], map: "loan_id")
+  @@index([updated_user_id], map: "updated_user_id")
+}
+
+model loan_histories {
+  loan_history_id                             Int           @id @default(autoincrement())
+  loan_id                                     Int
+  loan_status_id                              Int
+  created_at                                  DateTime?     @db.DateTime(0)
+  created_user_id                             Int?
+  updated_at                                  DateTime?     @db.DateTime(0)
+  updated_user_id                             Int?
+  loans                                       loans         @relation(fields: [loan_id], references: [loan_id], onDelete: NoAction, onUpdate: NoAction, map: "loan_histories_ibfk_1")
+  loan_statuses                               loan_statuses @relation(fields: [loan_status_id], references: [loan_status_id], onDelete: NoAction, onUpdate: NoAction, map: "loan_histories_ibfk_2")
+  users_loan_histories_created_user_idTousers users?        @relation("loan_histories_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "loan_histories_users_ibfk1")
+  users_loan_histories_updated_user_idTousers users?        @relation("loan_histories_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "request_histories_users_ibfk2")
+
+  @@index([created_user_id], map: "created_user_id")
+  @@index([loan_id], map: "loan_histories_ibfk_1")
+  @@index([loan_status_id], map: "loan_histories_ibfk_2")
+  @@index([updated_user_id], map: "updated_user_id")
+}
+
+model loan_installment_invoices {
+  deleted                                                                                    Boolean             @default(false)
+  loan_installment_invoice_id                                                                Int                 @id @default(autoincrement())
+  stamp                                                                                      DateTime?           @db.DateTime(0)
+  loan_installment_id                                                                        Int
+  invoice_number                                                                             String              @db.VarChar(125)
+  invoice_date                                                                               DateTime            @db.Date
+  cae                                                                                        String              @db.VarChar(125)
+  file_id                                                                                    Int
+  created_at                                                                                 DateTime?           @db.DateTime(0)
+  created_user_id                                                                            Int?
+  users                                                                                      users?              @relation(fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loainstallmencreauinv_idx")
+  files                                                                                      files               @relation(fields: [file_id], references: [file_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loainstallmenfiledx_idx")
+  loan_installments_loan_installment_invoices_loan_installment_idToloan_installments         loan_installments   @relation("loan_installment_invoices_loan_installment_idToloan_installments", fields: [loan_installment_id], references: [loan_installment_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loainstallmentinv_idx")
+  loan_installments_loan_installments_loan_installment_invoice_idToloan_installment_invoices loan_installments[] @relation("loan_installments_loan_installment_invoice_idToloan_installment_invoices")
+
+  @@index([created_user_id], map: "fk_loainstallmencreauinv_idx")
+  @@index([file_id], map: "fk_loainstallmenfiledx_idx")
+  @@index([loan_installment_id], map: "fk_loainstallmentinv_idx")
+}
+
+model loan_installments {
+  deleted                                                                                            Boolean                     @default(false)
+  loan_installment_id                                                                                Int                         @id @default(autoincrement())
+  loan_id                                                                                            Int
+  order                                                                                              Int
+  sinking_fund                                                                                       Decimal                     @db.Decimal(14, 2)
+  interest                                                                                           Decimal                     @db.Decimal(14, 2)
+  base                                                                                               Decimal                     @db.Decimal(14, 2)
+  vat                                                                                                Decimal                     @db.Decimal(14, 2)
+  fees                                                                                               Decimal                     @db.Decimal(14, 2)
+  total                                                                                              Decimal                     @db.Decimal(14, 2)
+  is_paid                                                                                            Boolean                     @default(false)
+  billing_date                                                                                       DateTime?                   @db.DateTime(0)
+  due_date                                                                                           DateTime?                   @db.DateTime(0)
+  balance                                                                                            Decimal                     @default(0.00) @db.Decimal(14, 2)
+  is_invoice_uploaded                                                                                Boolean                     @default(false)
+  loan_installment_invoice_id                                                                        Int?
+  created_at                                                                                         DateTime?                   @db.DateTime(0)
+  created_user_id                                                                                    Int?
+  updated_at                                                                                         DateTime?                   @db.DateTime(0)
+  updated_user_id                                                                                    Int?
+  loan_installment_invoices_loan_installment_invoices_loan_installment_idToloan_installments         loan_installment_invoices[] @relation("loan_installment_invoices_loan_installment_idToloan_installments")
+  loans                                                                                              loans                       @relation(fields: [loan_id], references: [loan_id], onDelete: Cascade, onUpdate: NoAction, map: "loan_installments_ibfk_1")
+  users_loan_installments_created_user_idTousers                                                     users?                      @relation("loan_installments_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "loan_installments_users_ibfk1")
+  users_loan_installments_updated_user_idTousers                                                     users?                      @relation("loan_installments_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "loan_installments_users_ibfk2")
+  loan_installment_invoices_loan_installments_loan_installment_invoice_idToloan_installment_invoices loan_installment_invoices?  @relation("loan_installments_loan_installment_invoice_idToloan_installment_invoices", fields: [loan_installment_invoice_id], references: [loan_installment_invoice_id], onDelete: NoAction, onUpdate: NoAction, map: "loaninvoiceidxinstall_mfx")
+  loan_payment_details                                                                               loan_payment_details[]
+
+  @@index([created_user_id], map: "created_user_id")
+  @@index([loan_id], map: "loan_id")
+  @@index([loan_installment_id], map: "loan_installment_id")
+  @@index([loan_installment_invoice_id], map: "loaninvoiceidxinstall_mfx")
+  @@index([updated_user_id], map: "updated_user_id")
+}
+
+model loan_payment_charge_files {
+  deleted                     Boolean       @default(false)
+  loan_payment_charge_file_id Int           @id @default(autoincrement())
+  loan_payment_id             Int
+  file_id                     Int
+  created_at                  DateTime?     @db.DateTime(0)
+  created_user_id             Int
+  files                       files         @relation(fields: [file_id], references: [file_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loanpaymentchargefileidx_files")
+  loan_payments               loan_payments @relation(fields: [loan_payment_id], references: [loan_payment_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loanpaymentchargefilexidx")
+  users                       users         @relation(fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loanpaymentchargefilexidx_userid")
+
+  @@index([file_id], map: "fk_loanpaymentchargefileidx_files")
+  @@index([loan_payment_id], map: "fk_loanpaymentchargefilexidx")
+  @@index([created_user_id], map: "fk_loanpaymentchargefilexidx_userid")
+}
+
+model loan_payment_details {
+  deleted                Boolean           @default(false)
+  loan_payment_detail_id Int               @id @default(autoincrement())
+  loan_payment_id        Int
+  loan_installment_id    Int
+  amount                 Decimal           @db.Decimal(14, 2)
+  amount_surcharge       Decimal?          @db.Decimal(14, 2)
+  interest_percentage    Decimal?          @db.Decimal(14, 4)
+  is_discount            Boolean           @default(false)
+  discount_percentage    Decimal?          @db.Decimal(14, 4)
+  amount_discount        Decimal           @default(0.00) @db.Decimal(8, 2)
+  total_amount           Decimal           @db.Decimal(14, 2)
+  created_at             DateTime?         @db.DateTime(0)
+  created_user_id        Int?
+  users                  users?            @relation(fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_createduserid_loan_pay_Detail")
+  loan_installments      loan_installments @relation(fields: [loan_installment_id], references: [loan_installment_id], onDelete: NoAction, onUpdate: NoAction, map: "loan_installment_id")
+  loan_payments          loan_payments     @relation(fields: [loan_payment_id], references: [loan_payment_id], onDelete: NoAction, onUpdate: NoAction, map: "loanpaymentdetail")
+
+  @@index([created_user_id], map: "fk_createduserid_loan_pay_Detail")
+  @@index([loan_installment_id], map: "loan_installment_id")
+  @@index([loan_payment_id], map: "loanpaymentdetail")
+}
+
+model loan_payment_mercadopago_transactions {
+  deleted                                 Boolean       @default(false)
+  loan_payment_mercadopago_transaction_id Int           @id @default(autoincrement())
+  loan_payment_id                         Int
+  payload_request                         String?       @db.LongText
+  payment_code                            String?       @db.VarChar(125)
+  url_endpoint                            String?       @db.LongText
+  collection_id                           String?       @db.VarChar(125)
+  collection_status                       String?       @db.VarChar(125)
+  external_reference                      String?       @db.VarChar(125)
+  payment_id                              String?       @db.VarChar(125)
+  payment_type                            String?       @db.VarChar(125)
+  merchant_order_id                       String?       @db.VarChar(125)
+  preference_id                           String?       @db.VarChar(125)
+  site_id                                 String?       @db.VarChar(125)
+  processing_mode                         String?       @db.VarChar(125)
+  merchant_account_id                     String?       @db.VarChar(125)
+  status                                  String?       @db.VarChar(125)
+  created_at                              DateTime      @db.DateTime(0)
+  loan_payments                           loan_payments @relation(fields: [loan_payment_id], references: [loan_payment_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loanpaymentmercadopagodix")
+
+  @@index([loan_payment_id], map: "fk_loanpaymentmercadopagodix")
+}
+
+model loan_payment_statuses {
+  deleted                Boolean         @default(false)
+  loan_payment_status_id Int             @id @default(autoincrement())
+  name                   String          @db.VarChar(125)
+  created_at             DateTime?       @db.DateTime(0)
+  loan_payments          loan_payments[]
+}
+
+model loan_payments {
+  deleted                               Boolean                                 @default(false)
+  loan_payment_id                       Int                                     @id @default(autoincrement())
+  stamp                                 DateTime                                @db.DateTime(0)
+  loan_id                               Int
+  payment_method_id                     Int
+  payment_code                          String?                                 @db.VarChar(125)
+  concept                               String?                                 @db.VarChar(125)
+  amount                                Decimal                                 @db.Decimal(14, 2)
+  is_pay                                Boolean                                 @default(false)
+  is_cancelled_total                    Boolean                                 @default(false)
+  loan_payment_status_id                Int
+  created_at                            DateTime?                               @db.DateTime(0)
+  created_user_id                       Int?
+  loan_payment_charge_files             loan_payment_charge_files[]
+  loan_payment_details                  loan_payment_details[]
+  loan_payment_mercadopago_transactions loan_payment_mercadopago_transactions[]
+  users                                 users?                                  @relation(fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_createduserid_loan_pay")
+  loans                                 loans                                   @relation(fields: [loan_id], references: [loan_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loan_pay")
+  loan_payment_statuses                 loan_payment_statuses                   @relation(fields: [loan_payment_status_id], references: [loan_payment_status_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_statuspaymentidx")
+  payment_methods                       payment_methods                         @relation(fields: [payment_method_id], references: [payment_method_id], onDelete: NoAction, onUpdate: NoAction, map: "´fk_loanpaymentmethodixd´")
+  movements                             movements[]
+
+  @@index([created_user_id], map: "fk_createduserid_loan_pay")
+  @@index([loan_id], map: "fk_loan_pay")
+  @@index([loan_payment_status_id], map: "fk_statuspaymentidx")
+  @@index([payment_method_id], map: "´fk_loanpaymentmethodixd´")
+}
+
+model loan_statuses {
+  loan_status_id Int              @id @default(autoincrement())
+  name           String           @db.VarChar(255)
+  loan_histories loan_histories[]
+  loans          loans[]
+}
+
+model loans {
+  deleted                            Boolean                       @default(false)
+  loan_id                            Int                           @id @default(autoincrement())
+  loan_status_id                     Int
+  loan_expiration_cycle_id           Int?
+  approval_date                      DateTime?                     @db.DateTime(0)
+  cancel_date                        DateTime?                     @db.DateTime(0)
+  stamp                              DateTime                      @db.DateTime(0)
+  code                               String                        @db.VarChar(255)
+  customer_id                        Int
+  amount                             Decimal                       @db.Decimal(14, 2)
+  return                             Decimal                       @db.Decimal(14, 2)
+  interest_rate_id                   Int
+  nominal_rate                       Decimal                       @db.Decimal(14, 2)
+  expenses_rate                      Decimal                       @db.Decimal(14, 2)
+  installments                       Int
+  internal_rate_return               Decimal                       @db.Decimal(14, 2)
+  overall_financial_cost             Decimal                       @db.Decimal(14, 2)
+  bank_id                            Int
+  account_number                     String                        @db.VarChar(255)
+  created_at                         DateTime?                     @db.DateTime(0)
+  created_user_id                    Int?
+  updated_at                         DateTime?                     @db.DateTime(0)
+  updated_user_id                    Int?
+  loan_contracts                     loan_contracts[]
+  loan_customer_nosis_reports        loan_customer_nosis_reports[]
+  loan_files                         loan_files[]
+  loan_histories                     loan_histories[]
+  loan_installments                  loan_installments[]
+  loan_payments                      loan_payments[]
+  loan_expiration_cycles             loan_expiration_cycles?       @relation(fields: [loan_expiration_cycle_id], references: [loan_expiration_cycle_id], onDelete: NoAction, onUpdate: NoAction, map: "loan_expirationcycleid")
+  users_loans_created_user_idTousers users?                        @relation("loans_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "loans_ibfk_1")
+  users_loans_updated_user_idTousers users?                        @relation("loans_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "loans_ibfk_2")
+  loan_statuses                      loan_statuses                 @relation(fields: [loan_status_id], references: [loan_status_id], onDelete: NoAction, onUpdate: NoAction, map: "loans_ibfk_3")
+  interest_rates                     interest_rates                @relation(fields: [interest_rate_id], references: [interest_rate_id], onDelete: NoAction, onUpdate: NoAction, map: "loans_ibfk_4")
+  customers                          customers                     @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "loans_ibfk_5")
+  banks                              banks                         @relation(fields: [bank_id], references: [bank_id], onDelete: NoAction, onUpdate: NoAction, map: "loans_ibfk_6")
+  movements                          movements[]
+  rejected_loans                     rejected_loans[]
+
+  @@index([bank_id], map: "bank_id")
+  @@index([created_user_id], map: "created_user_id")
+  @@index([customer_id], map: "customer_id")
+  @@index([interest_rate_id], map: "interest_rate_id")
+  @@index([loan_expiration_cycle_id], map: "loan_expirationcycleid")
+  @@index([loan_status_id], map: "loan_status_id")
+  @@index([updated_user_id], map: "updated_user_id")
+}
+
+model module_documents {
+  deleted                                       Boolean                @default(false)
+  module_document_id                            Int                    @id @default(autoincrement())
+  name                                          String                 @db.VarChar(125)
+  image_url                                     String?                @db.VarChar(255)
+  sort                                          Int
+  module_id                                     Int
+  created_at                                    DateTime?              @db.DateTime(0)
+  created_user_id                               Int?
+  updated_at                                    DateTime?              @db.DateTime(0)
+  updated_user_id                               Int?
+  customer_attachments                          customer_attachments[]
+  users_module_documents_created_user_idTousers users?                 @relation("module_documents_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_createduseriddmd")
+  modules                                       modules                @relation(fields: [module_id], references: [module_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_moduleidxmd")
+  users_module_documents_updated_user_idTousers users?                 @relation("module_documents_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_updateduseriddmd")
+
+  @@index([created_user_id], map: "fk_createduseriddmd")
+  @@index([module_id], map: "fk_moduleidxmd")
+  @@index([updated_user_id], map: "fk_updateduseriddmd")
+}
+
+model modules {
+  deleted                              Boolean            @default(false)
+  module_id                            Int                @id @default(autoincrement())
+  name                                 String             @db.VarChar(125)
+  code                                 String?            @db.VarChar(21)
+  created_at                           DateTime?          @db.DateTime(0)
+  created_user_id                      Int?
+  updated_at                           DateTime?          @db.DateTime(0)
+  updated_user_id                      Int?
+  module_documents                     module_documents[]
+  users_modules_created_user_idTousers users?             @relation("modules_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_createduseriddrc")
+  users_modules_updated_user_idTousers users?             @relation("modules_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_updateduseriddrc")
+
+  @@index([created_user_id], map: "fk_createduseriddrc")
+  @@index([updated_user_id], map: "fk_updateduseriddrc")
+}
+
+model movements {
+  movement_id                            Int            @id @default(autoincrement())
+  stamp                                  DateTime       @db.DateTime(0)
+  loan_id                                Int?
+  loan_payment_id                        Int?
+  amount                                 Decimal        @db.Decimal(14, 2)
+  balance                                Decimal        @db.Decimal(14, 2)
+  comments                               String?        @db.VarChar(255)
+  created_at                             DateTime?      @db.DateTime(0)
+  created_user_id                        Int?
+  updated_at                             DateTime?      @db.DateTime(0)
+  updated_user_id                        Int?
+  loans                                  loans?         @relation(fields: [loan_id], references: [loan_id], onDelete: NoAction, onUpdate: NoAction, map: "movement_loan_id")
+  loan_payments                          loan_payments? @relation(fields: [loan_payment_id], references: [loan_payment_id], onDelete: NoAction, onUpdate: NoAction, map: "movement_pay_detail")
+  users_movements_created_user_idTousers users?         @relation("movements_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "movements_users_ibfk1")
+  users_movements_updated_user_idTousers users?         @relation("movements_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "movements_users_ibfk2")
+
+  @@index([created_user_id], map: "created_user_id")
+  @@index([loan_id], map: "movement_loan_id")
+  @@index([loan_payment_id], map: "movement_pay_detail")
+  @@index([updated_user_id], map: "updated_user_id")
+}
+
+model notifications {
+  deleted          Boolean   @default(false)
+  notification_id  Int       @id @default(autoincrement())
+  stamp            DateTime  @db.DateTime(0)
+  title            String?   @db.LongText
+  content          String?   @db.LongText
+  user_receiver_id Int
+  is_read          Boolean   @default(false)
+  response         String?   @db.LongText
+  created_at       DateTime? @db.DateTime(0)
+  users            users     @relation(fields: [user_receiver_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_notidetailnotireceiver_idx")
+
+  @@index([user_receiver_id], map: "fk_notidetailnotireceiver_idx")
+}
+
+model payment_method_preferences {
+  deleted                                                 Boolean         @default(false)
+  payment_method_preference_id                            Int             @id @default(autoincrement())
+  payment_method_id                                       Int
+  name                                                    String          @db.VarChar(125)
+  code                                                    String          @db.VarChar(125)
+  value                                                   String?         @db.LongText
+  created_at                                              DateTime?       @db.DateTime(0)
+  created_user_id                                         Int?
+  updated_at                                              DateTime?       @db.DateTime(0)
+  updated_user_id                                         Int?
+  users_payment_method_preferences_created_user_idTousers users?          @relation("payment_method_preferences_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_paymentmpf_usercreatedidx")
+  users_payment_method_preferences_updated_user_idTousers users?          @relation("payment_method_preferences_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_paymentmpf_userupdatedidx")
+  payment_methods                                         payment_methods @relation(fields: [payment_method_id], references: [payment_method_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_paymentmpfpaymentmethodidx")
+
+  @@index([created_user_id], map: "fk_paymentmpf_usercreatedidx")
+  @@index([updated_user_id], map: "fk_paymentmpf_userupdatedidx")
+  @@index([payment_method_id], map: "fk_paymentmpfpaymentmethodidx")
+}
+
+model payment_methods {
+  deleted                                      Boolean                      @default(false)
+  payment_method_id                            Int                          @id @default(autoincrement())
+  name                                         String                       @db.VarChar(125)
+  code                                         String                       @db.VarChar(125)
+  website_url                                  String?                      @db.VarChar(125)
+  logo_url                                     String?                      @db.VarChar(125)
+  active                                       Boolean                      @default(true)
+  created_at                                   DateTime?                    @db.DateTime(0)
+  created_user_id                              Int?
+  updated_at                                   DateTime?                    @db.DateTime(0)
+  updated_user_id                              Int?
+  loan_payments                                loan_payments[]
+  payment_method_preferences                   payment_method_preferences[]
+  users_payment_methods_created_user_idTousers users?                       @relation("payment_methods_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_paymentm_usercreatedidx")
+  users_payment_methods_updated_user_idTousers users?                       @relation("payment_methods_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_paymentm_userupdatedidx")
+
+  @@index([created_user_id], map: "fk_paymentm_usercreatedidx")
+  @@index([updated_user_id], map: "fk_paymentm_userupdatedidx")
+}
+
+model rejected_loans {
+  deleted                                     Boolean           @default(false)
+  rejected_loan_id                            Int               @id @default(autoincrement())
+  stamp                                       DateTime          @db.DateTime(0)
+  loan_id                                     Int
+  rejection_reason_id                         Int
+  observations                                String?           @db.LongText
+  created_at                                  DateTime?         @db.DateTime(0)
+  created_user_id                             Int
+  updated_at                                  DateTime?         @db.DateTime(0)
+  updated_user_id                             Int?
+  users_rejected_loans_created_user_idTousers users             @relation("rejected_loans_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_createduserrejectedloan")
+  loans                                       loans             @relation(fields: [loan_id], references: [loan_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_loan_rejected_id")
+  rejection_reasons                           rejection_reasons @relation(fields: [rejection_reason_id], references: [rejection_reason_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rejection_reasons_id")
+  users_rejected_loans_updated_user_idTousers users?            @relation("rejected_loans_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_updateduseridrejectedloan")
+
+  @@index([created_user_id], map: "fk_createduserrejectedloan")
+  @@index([loan_id], map: "fk_loan_rejected_id")
+  @@index([rejection_reason_id], map: "fk_rejection_reasons_id")
+  @@index([updated_user_id], map: "fk_updateduseridrejectedloan")
+}
+
+model rejection_reasons {
+  deleted                                        Boolean          @default(false)
+  active                                         Boolean          @default(true)
+  rejection_reason_id                            Int              @id @default(autoincrement())
+  code                                           String           @db.VarChar(30)
+  name                                           String           @db.VarChar(255)
+  created_at                                     DateTime?        @db.DateTime(0)
+  created_user_id                                Int
+  updated_at                                     DateTime?        @db.DateTime(0)
+  updated_user_id                                Int?
+  rejected_loans                                 rejected_loans[]
+  users_rejection_reasons_created_user_idTousers users            @relation("rejection_reasons_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_createduseridrejected")
+  users_rejection_reasons_updated_user_idTousers users?           @relation("rejection_reasons_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_updateduseridrejected")
+
+  @@index([created_user_id], map: "fk_createduseridrejected")
+  @@index([updated_user_id], map: "fk_updateduseridrejected")
+}
+
+model roles {
+  role_id    Int          @id @default(autoincrement())
+  name       String?      @db.VarChar(50)
+  user_roles user_roles[]
+}
+
+model states {
+  deleted    Boolean     @default(false)
+  state_id   Int         @id @default(autoincrement())
+  country_id Int
+  name       String      @db.VarChar(255)
+  latitude   Decimal?    @db.Decimal(11, 8)
+  longitude  Decimal?    @db.Decimal(11, 8)
+  cities     cities[]
+  customers  customers[]
+  countries  countries   @relation(fields: [country_id], references: [country_id], onDelete: NoAction, onUpdate: NoAction, map: "states_ibfk_1")
+
+  @@index([country_id], map: "country_id")
+}
+
+model user_recovery_passwords {
+  user_recovery_password_id Int       @id @default(autoincrement())
+  user_id                   Int
+  recovery_code             String    @db.VarChar(125)
+  is_confirmed              Boolean   @default(false)
+  confirmation_date         DateTime? @db.DateTime(0)
+  is_expired                Boolean   @default(false)
+  expired_at                DateTime? @db.DateTime(0)
+  comments                  String?   @db.LongText
+  created_at                DateTime? @db.DateTime(0)
+  users                     users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_userrecoverypasswordifdx")
+
+  @@index([user_id], map: "fk_userrecoverypasswordifdx")
+}
+
+model user_roles {
+  user_role_id Int   @id @default(autoincrement())
+  user_id      Int
+  role_id      Int
+  roles        roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_roles_roles")
+  users        users @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_roles_users")
+
+  @@index([role_id], map: "fk_user_roles_roles")
+  @@index([user_id], map: "fk_user_roles_users")
+}
+
+model users {
+  deleted                                                                      Boolean                       @default(false)
+  active                                                                       Boolean                       @default(true)
+  user_id                                                                      Int                           @id @default(autoincrement())
+  user_name                                                                    String?                       @db.VarChar(255)
+  last_name                                                                    String?                       @db.VarChar(255)
+  first_name                                                                   String?                       @db.VarChar(255)
+  email                                                                        String                        @db.VarChar(255)
+  hash                                                                         String?                       @db.VarChar(255)
+  created_at                                                                   DateTime?                     @db.DateTime(0)
+  created_user_id                                                              Int?
+  updated_at                                                                   DateTime?                     @db.DateTime(0)
+  updated_user_id                                                              Int?
+  activities_activities_created_user_idTousers                                 activities[]                  @relation("activities_created_user_idTousers")
+  activities_activities_updated_user_idTousers                                 activities[]                  @relation("activities_updated_user_idTousers")
+  api_keys_api_keys_created_user_idTousers                                     api_keys[]                    @relation("api_keys_created_user_idTousers")
+  api_keys_api_keys_updated_user_idTousers                                     api_keys[]                    @relation("api_keys_updated_user_idTousers")
+  banks_banks_created_user_idTousers                                           banks[]                       @relation("banks_created_user_idTousers")
+  banks_banks_updated_user_idTousers                                           banks[]                       @relation("banks_updated_user_idTousers")
+  configuration_parameters_configuration_parameters_created_user_idTousers     configuration_parameters[]    @relation("configuration_parameters_created_user_idTousers")
+  configuration_parameters_configuration_parameters_updated_user_idTousers     configuration_parameters[]    @relation("configuration_parameters_updated_user_idTousers")
+  configurations_configurations_created_user_idTousers                         configurations[]              @relation("configurations_created_user_idTousers")
+  configurations_configurations_updated_user_idTousers                         configurations[]              @relation("configurations_updated_user_idTousers")
+  customer_nosis_reports                                                       customer_nosis_reports[]
+  customers_customers_user_idTousers                                           customers[]                   @relation("customers_user_idTousers")
+  customers_customers_created_user_idTousers                                   customers[]                   @relation("customers_created_user_idTousers")
+  customers_customers_updated_user_idTousers                                   customers[]                   @relation("customers_updated_user_idTousers")
+  fcm_tokens                                                                   fcm_tokens[]
+  files_files_created_user_idTousers                                           files[]                       @relation("files_created_user_idTousers")
+  files_files_updated_user_idTousers                                           files[]                       @relation("files_updated_user_idTousers")
+  incomes_incomes_created_user_idTousers                                       incomes[]                     @relation("incomes_created_user_idTousers")
+  incomes_incomes_updated_user_idTousers                                       incomes[]                     @relation("incomes_updated_user_idTousers")
+  interest_rates_interest_rates_created_user_idTousers                         interest_rates[]              @relation("interest_rates_created_user_idTousers")
+  interest_rates_interest_rates_updated_user_idTousers                         interest_rates[]              @relation("interest_rates_updated_user_idTousers")
+  loan_contracts_loan_contracts_created_user_idTousers                         loan_contracts[]              @relation("loan_contracts_created_user_idTousers")
+  loan_contracts_loan_contracts_updated_user_idTousers                         loan_contracts[]              @relation("loan_contracts_updated_user_idTousers")
+  loan_customer_nosis_reports                                                  loan_customer_nosis_reports[]
+  loan_expiration_cycles_loan_expiration_cycles_created_user_idTousers         loan_expiration_cycles[]      @relation("loan_expiration_cycles_created_user_idTousers")
+  loan_expiration_cycles_loan_expiration_cycles_updated_user_idTousers         loan_expiration_cycles[]      @relation("loan_expiration_cycles_updated_user_idTousers")
+  loan_files_loan_files_created_user_idTousers                                 loan_files[]                  @relation("loan_files_created_user_idTousers")
+  loan_files_loan_files_updated_user_idTousers                                 loan_files[]                  @relation("loan_files_updated_user_idTousers")
+  loan_histories_loan_histories_created_user_idTousers                         loan_histories[]              @relation("loan_histories_created_user_idTousers")
+  loan_histories_loan_histories_updated_user_idTousers                         loan_histories[]              @relation("loan_histories_updated_user_idTousers")
+  loan_installment_invoices                                                    loan_installment_invoices[]
+  loan_installments_loan_installments_created_user_idTousers                   loan_installments[]           @relation("loan_installments_created_user_idTousers")
+  loan_installments_loan_installments_updated_user_idTousers                   loan_installments[]           @relation("loan_installments_updated_user_idTousers")
+  loan_payment_charge_files                                                    loan_payment_charge_files[]
+  loan_payment_details                                                         loan_payment_details[]
+  loan_payments                                                                loan_payments[]
+  loans_loans_created_user_idTousers                                           loans[]                       @relation("loans_created_user_idTousers")
+  loans_loans_updated_user_idTousers                                           loans[]                       @relation("loans_updated_user_idTousers")
+  module_documents_module_documents_created_user_idTousers                     module_documents[]            @relation("module_documents_created_user_idTousers")
+  module_documents_module_documents_updated_user_idTousers                     module_documents[]            @relation("module_documents_updated_user_idTousers")
+  modules_modules_created_user_idTousers                                       modules[]                     @relation("modules_created_user_idTousers")
+  modules_modules_updated_user_idTousers                                       modules[]                     @relation("modules_updated_user_idTousers")
+  movements_movements_created_user_idTousers                                   movements[]                   @relation("movements_created_user_idTousers")
+  movements_movements_updated_user_idTousers                                   movements[]                   @relation("movements_updated_user_idTousers")
+  notifications                                                                notifications[]
+  payment_method_preferences_payment_method_preferences_created_user_idTousers payment_method_preferences[]  @relation("payment_method_preferences_created_user_idTousers")
+  payment_method_preferences_payment_method_preferences_updated_user_idTousers payment_method_preferences[]  @relation("payment_method_preferences_updated_user_idTousers")
+  payment_methods_payment_methods_created_user_idTousers                       payment_methods[]             @relation("payment_methods_created_user_idTousers")
+  payment_methods_payment_methods_updated_user_idTousers                       payment_methods[]             @relation("payment_methods_updated_user_idTousers")
+  rejected_loans_rejected_loans_created_user_idTousers                         rejected_loans[]              @relation("rejected_loans_created_user_idTousers")
+  rejected_loans_rejected_loans_updated_user_idTousers                         rejected_loans[]              @relation("rejected_loans_updated_user_idTousers")
+  rejection_reasons_rejection_reasons_created_user_idTousers                   rejection_reasons[]           @relation("rejection_reasons_created_user_idTousers")
+  rejection_reasons_rejection_reasons_updated_user_idTousers                   rejection_reasons[]           @relation("rejection_reasons_updated_user_idTousers")
+  user_recovery_passwords                                                      user_recovery_passwords[]
+  user_roles                                                                   user_roles[]
+  users_users_created_user_idTousers                                           users?                        @relation("users_created_user_idTousers", fields: [created_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "users_ibfk_1")
+  other_users_users_created_user_idTousers                                     users[]                       @relation("users_created_user_idTousers")
+  users_users_updated_user_idTousers                                           users?                        @relation("users_updated_user_idTousers", fields: [updated_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "users_ibfk_2")
+  other_users_users_updated_user_idTousers                                     users[]                       @relation("users_updated_user_idTousers")
+
+  @@index([created_user_id], map: "created_user_id")
+  @@index([updated_user_id], map: "updated_user_id")
+}

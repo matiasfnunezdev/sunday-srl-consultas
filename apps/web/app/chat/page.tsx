@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression -- N/A */
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
-import { getMessaging, onMessage } from 'firebase/messaging';
 import type { Unsubscribe } from 'firebase/database';
 import {
 	getDatabase,
@@ -34,16 +33,14 @@ import {
 	updateConversation,
 } from '@/_core/utils/api-helper';
 import useGetMessagesViewModel from '@/_presentation/message/get-messages-view-model';
+import useGetClientViewModel from '@/_presentation/client/get-client-view-model';
 import type { Message } from '@/_domain/interfaces/message';
+import EditClientModal from '@/_core/components/client/edit-client-modal';
 
 export default function Page(): JSX.Element {
 	const router = useRouter();
-	const {
-		handleRefetchUserInfo,
-		getAccessToken,
-		userInfo,
-		isAuthReady,
-	} = useAuth();
+	const { handleRefetchUserInfo, getAccessToken, userInfo, isAuthReady } =
+		useAuth();
 	const addSnackbar = useSnackbar();
 	const {
 		conversations,
@@ -53,9 +50,15 @@ export default function Page(): JSX.Element {
 		setSelectedConversationMessages,
 		isLoading,
 		setIsLoading,
+		clientInfo,
+		setClientInfo,
+		setClientData,
+		isEditClientModalOpen,
+		setIsEditClientModalOpen,
 	} = useConversations();
 
 	const { getMessages, messages } = useGetMessagesViewModel();
+	const { client, getClient } = useGetClientViewModel();
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [updateInfo, setUpdateInfo] = useState<any | null>(null);
@@ -94,6 +97,16 @@ export default function Page(): JSX.Element {
 		}
 	};
 
+	const handleGetClient = async (clientId: string): Promise<void> => {
+		const sid = selectedConversation?.sid;
+		if (sid) {
+			const accessToken = await getAccessToken();
+			if (accessToken) {
+				await getClient(accessToken, clientId);
+			}
+		}
+	};
+
 	const openModal = (): void => {
 		setIsModalOpen(true);
 	};
@@ -112,14 +125,6 @@ export default function Page(): JSX.Element {
 				console.log('Ref not found');
 			}
 		}, 100);
-	};
-
-	const handleFetchConversationMessages = async (): Promise<void> => {
-		const accessToken = await getAccessToken();
-		if (accessToken) {
-			const result = await fetchConversations(accessToken);
-			setConversations(result);
-		}
 	};
 
 	useEffect(() => {
@@ -173,16 +178,7 @@ export default function Page(): JSX.Element {
 		let unsubscribeFromUpdates: Unsubscribe;
 		try {
 			firebaseCloudMessaging.init();
-
-			const messaging = getMessaging();
 			const database = getDatabase();
-			if (messaging) {
-				onMessage(messaging, () => {
-					handleFetchConversationMessages();
-				});
-			} else {
-				console.error('Firebase Messaging is not supported or initialized.');
-			}
 
 			const updatesRef = ref(database, 'updates');
 			const latestUpdateQuery = query(updatesRef, limitToLast(1));
@@ -237,7 +233,12 @@ export default function Page(): JSX.Element {
 
 	useEffect(() => {
 		if (messages?.length) {
+			let author = '';
 			const mappedMessages = messages.map((message: Message) => {
+				if (message.author.includes('whatsapp')) {
+					author = message.author;
+				}
+
 				return {
 					index: message.index,
 					role: message.author.includes('whatsapp') ? 'user' : 'assistant',
@@ -246,6 +247,10 @@ export default function Page(): JSX.Element {
 					dateCreated: message.dateCreated,
 					media: message.media,
 				};
+			});
+
+			setClientInfo((prev: any) => {
+				return { ...prev, author };
 			});
 
 			setSelectedConversationMessages(mappedMessages);
@@ -277,9 +282,9 @@ export default function Page(): JSX.Element {
 					const conversationsResult = await fetchConversations(accessToken);
 					setConversations(conversationsResult);
 				}
-			} catch(error) {
-				console.log('error', error)
-				console.error('setSelectedConversationAsRead error: ', error)
+			} catch (error) {
+				console.log('error', error);
+				console.error('setSelectedConversationAsRead error: ', error);
 			} finally {
 				setIsLoading(false);
 			}
@@ -308,7 +313,7 @@ export default function Page(): JSX.Element {
 					});
 
 					const conversationsResult = await fetchConversations(accessToken);
-					console.log('conversationsResult', conversationsResult)
+					console.log('conversationsResult', conversationsResult);
 					if (conversationsResult?.length) {
 						setConversations(conversationsResult);
 					}
@@ -334,6 +339,30 @@ export default function Page(): JSX.Element {
 			}
 		}
 	}, [updateInfo]);
+
+	useEffect(() => {
+		console.log('clientInfo', clientInfo);
+		const author = clientInfo?.author?.split(':')?.[1]?.replace('+', '');
+		if (author) {
+			void handleGetClient(author);
+		}
+	}, [clientInfo]);
+
+	useEffect(() => {
+		console.log('client', client);
+		if (client) {
+			setClientData({
+				...client,
+				clientId: clientInfo?.author?.split(':')?.[1]?.replace('+', ''),
+			});
+			setSelectedConversationMessages(
+				selectedConversationMessages?.map((message) => {
+					console.log('message', message);
+					return { ...message, fullName: client?.fullName };
+				})
+			);
+		}
+	}, [client]);
 
 	const renderFullName = `${userInfo?.displayName}`;
 
@@ -459,6 +488,13 @@ export default function Page(): JSX.Element {
 					/>
 					{isTagModalOpen ? (
 						<TagsModal onClose={() => setIsTagModalOpen((prev) => !prev)} />
+					) : null}
+					{isEditClientModalOpen ? (
+						<EditClientModal
+							onClose={() => {
+								setIsEditClientModalOpen((prev) => !prev);
+							}}
+						/>
 					) : null}
 					{renderLogOutModal}
 				</main>

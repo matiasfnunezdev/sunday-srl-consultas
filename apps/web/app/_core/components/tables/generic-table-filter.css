@@ -1,0 +1,15 @@
+.generic-table-filter {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	border-bottom: 1px solid #d9d9d9;
+}
+
+.generic-filter-icon {
+	position: relative;
+	bottom: 12px;
+}
+
+.generic-filter-close {
+	cursor: pointer;
+}
