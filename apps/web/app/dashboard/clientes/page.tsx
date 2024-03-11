@@ -115,8 +115,9 @@ export default function Clientes(): JSX.Element {
 
 	useEffect(() => {
 		console.log('filtersParams', filtersParams);
-
-		void handleFilterParamsChange(filtersParams);
+		if (pagesData.totalRecords > 1) {
+			void handleFilterParamsChange(filtersParams);
+		}
 	}, [filtersParams]);
 
 	const newLocal = 'bg-white h-content w-full';
