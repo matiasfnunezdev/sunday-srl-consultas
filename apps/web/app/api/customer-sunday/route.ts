@@ -2,9 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const prisma = new PrismaClient();
-
 export async function GET(req: NextRequest): Promise<NextResponse> {
+	const prisma = new PrismaClient();
 	const customerId = req.nextUrl.searchParams.get('id');
 	const page = parseInt(req.nextUrl.searchParams.get('page') || '1', 10);
 	const pageSize = parseInt(
