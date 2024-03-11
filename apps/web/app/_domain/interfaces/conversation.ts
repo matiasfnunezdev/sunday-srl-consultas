@@ -12,6 +12,7 @@ export interface Conversation {
 	unread?: boolean;
 	author?: string;
 	created?: string;
+	fullName?: string;
 }
 
 export interface ConversationLinks {

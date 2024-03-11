@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -61,6 +61,7 @@ export default function ReadConversations(): JSX.Element {
 			const isSelected =
 				selectedConversationSid === conversation?.conversationSId;
 			const selectedClasses = isSelected ? 'bg-neutral-500 rounded-lg' : '';
+			console.log('conversation', conversation);
 			return (
 				<button
 					className={`flex flex-row justify-start items-center gap-2 cursor-pointer ${selectedClasses} p-4`}
@@ -84,7 +85,9 @@ export default function ReadConversations(): JSX.Element {
 							<span className="absolute flex flex-row justify-center items-center p-1 top-0 right-0 bg-red-500 rounded-full h-3 w-3 text-[9px]" />
 						)}
 					</div>
-					<div>{conversation?.author?.split('+')[1]}</div>
+					<div>
+						{conversation?.fullName ?? conversation?.author?.split('+')[1]}
+					</div>
 				</button>
 			);
 		});

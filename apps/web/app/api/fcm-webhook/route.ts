@@ -118,6 +118,7 @@ export async function POST(req: Request) {
 							openCase: true,
 							unreadMessagesCount: currentUnreadMessagesCount + 1,
 							unread: true,
+							fullName: client?.fullName,
 						},
 						conversationsCollection
 					);
