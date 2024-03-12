@@ -3,7 +3,11 @@
 
 /* eslint-disable @typescript-eslint/no-confusing-void-expression -- description */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { faArrowDown, faFile, faUpload } from '@fortawesome/free-solid-svg-icons';
+import {
+	faArrowDown,
+	faFile,
+	faUpload,
+} from '@fortawesome/free-solid-svg-icons';
 import { useDropzone } from 'react-dropzone';
 import { Button } from './ButtonChat';
 
@@ -83,9 +87,9 @@ export function ModalResponder({ show, onClose, onSend }) {
 								backgroundColor="[#2b2c34]"
 								hoverColor="#40414E"
 								icon={faFile}
-                onClick={() => {
-                  setImage(undefined)
-                }}
+								onClick={() => {
+									setImage(undefined);
+								}}
 								padding="3"
 								text={image?.file?.path}
 								textColor="white"

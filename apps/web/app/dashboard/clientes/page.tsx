@@ -114,7 +114,6 @@ export default function Clientes(): JSX.Element {
 	}, [clientsData, pagesData]);
 
 	useEffect(() => {
-		console.log('filtersParams', filtersParams);
 		if (pagesData.totalRecords > 1) {
 			void handleFilterParamsChange(filtersParams);
 		}

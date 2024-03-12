@@ -1,20 +1,23 @@
 'use client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencil } from '@fortawesome/free-solid-svg-icons';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useConversations } from '@/_core/contexts/conversations-context';
 
 export default function InfoIdComponent(): JSX.Element {
 	const { clientData, setIsEditClientModalOpen } = useConversations();
+	const [clientFullName, setClientFullName] = useState('');
 
 	const handleTogglePanel = (): void => {};
 
 	useEffect(() => {
-		console.log('clientData', clientData);
+		console.log('clientData1', clientData);
+		if (clientData?.fullName) {
+			setClientFullName(clientData?.fullName);
+		} else {
+			setClientFullName(clientData?.author?.split(':')?.[1]);
+		}
 	}, [clientData]);
-
-	const renderClientName =
-		clientData?.fullName ?? clientData?.author?.split(':')?.[1];
 
 	return (
 		<div className="w-full bg-[#555759] rounded-md ">
@@ -27,7 +30,7 @@ export default function InfoIdComponent(): JSX.Element {
 			>
 				<div className="flex justify-between">
 					<div className="flex flex-col text-left p-2">
-						<span>ID - {renderClientName}</span>
+						<span>ID - {clientFullName}</span>
 					</div>
 				</div>
 				<button

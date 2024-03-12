@@ -1,5 +1,4 @@
 export const formatPhoneNumber = (phoneNumber: string): string => {
-	console.log('phoneNumber', phoneNumber);
 	if (phoneNumber.length !== 13) {
 		return phoneNumber;
 	}

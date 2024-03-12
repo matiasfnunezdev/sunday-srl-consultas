@@ -17,6 +17,8 @@ export default function EditClientModal(props: TagsModalProps): JSX.Element {
 		setClientData,
 		selectedConversationMessages,
 		setSelectedConversationMessages,
+		conversations,
+		setConversations,
 	} = useConversations();
 	const { updateClient } = useUpdateClientViewModel();
 	const [fullName, setFullName] = useState(
@@ -39,6 +41,14 @@ export default function EditClientModal(props: TagsModalProps): JSX.Element {
 				setSelectedConversationMessages(
 					selectedConversationMessages?.map((message) => {
 						return { ...message, fullName };
+					})
+				);
+				setConversations(
+					conversations?.map((conversation) => {
+						if (conversation.author === clientData.author) {
+							return { ...conversation, fullName };
+						}
+						return conversation;
 					})
 				);
 				onClose();

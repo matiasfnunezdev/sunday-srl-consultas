@@ -313,7 +313,6 @@ export default function Page(): JSX.Element {
 					});
 
 					const conversationsResult = await fetchConversations(accessToken);
-					console.log('conversationsResult', conversationsResult);
 					if (conversationsResult?.length) {
 						setConversations(conversationsResult);
 					}
@@ -341,7 +340,6 @@ export default function Page(): JSX.Element {
 	}, [updateInfo]);
 
 	useEffect(() => {
-		console.log('clientInfo', clientInfo);
 		const author = clientInfo?.author?.split(':')?.[1]?.replace('+', '');
 		if (author) {
 			void handleGetClient(author);
@@ -349,7 +347,6 @@ export default function Page(): JSX.Element {
 	}, [clientInfo]);
 
 	useEffect(() => {
-		console.log('client', client);
 		if (client) {
 			setClientData({
 				...client,
@@ -357,7 +354,6 @@ export default function Page(): JSX.Element {
 			});
 			setSelectedConversationMessages(
 				selectedConversationMessages?.map((message) => {
-					console.log('message', message);
 					return { ...message, fullName: client?.fullName };
 				})
 			);

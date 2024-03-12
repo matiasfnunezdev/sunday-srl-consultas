@@ -79,7 +79,6 @@ export default function UnreadConversations(): JSX.Element {
 			const isSelected =
 				selectedConversationSid === conversation?.conversationSId;
 			const selectedClasses = isSelected ? 'bg-neutral-500 rounded-lg' : '';
-			console.log('conversation', conversation);
 			return (
 				<button
 					className={`flex flex-row justify-start items-center gap-2 cursor-pointer ${selectedClasses} p-4`}

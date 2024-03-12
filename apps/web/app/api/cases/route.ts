@@ -7,9 +7,9 @@ import type { Client } from '@/_domain/interfaces/client';
 
 export async function GET(req: Request): Promise<NextResponse> {
 	const url = new URL(req.url);
-	const clientId = url.searchParams.get('id');
+	const messageSIdStart = url.searchParams.get('id');
+	const tagIds = url.searchParams.get('tagIds') ?? [];
 	const author = url.searchParams.get('author');
-	const fullName = url.searchParams.get('fullName');
 	const page = Number(url.searchParams.get('page')) || 1;
 	const rowsPerPage = Number(url.searchParams.get('rowsPerPage')) || 10;
 
@@ -19,12 +19,12 @@ export async function GET(req: Request): Promise<NextResponse> {
 		await validateFirebaseIdToken(req, auth);
 		const db = firebaseAdmin().firestore;
 
-		if (clientId) {
-			const clientsCollection = db.collection('clients');
+		if (messageSIdStart) {
+			const caseCollections = db.collection('cases');
 			const result = await getOne(
-				`whatsapp:+${clientId}`,
-				'author',
-				clientsCollection
+				messageSIdStart,
+				'messageSIdStart',
+				caseCollections
 			);
 
 			if (result) {
@@ -43,27 +43,19 @@ export async function GET(req: Request): Promise<NextResponse> {
 		} else {
 			const query = db
 				.collection('clients')
+				.where('tags', 'array-contains-any', tagIds)
 				.limit(rowsPerPage)
 				.offset((page - 1) * rowsPerPage);
 
-			const clientsSnapshot = await query.get();
+			const casesSnapshot = await query.get();
 
-			let result = clientsSnapshot.docs.map((doc) => doc.data() as Client);
+			let result = casesSnapshot.docs.map((doc) => doc.data() as Client);
 
 			console.log('result1', result);
 
 			if (author) {
 				// Filter the result in memory by author
 				result = result.filter((client) => client.author === author);
-			}
-
-			if (fullName) {
-				const searchValue = fullName.toLowerCase();
-
-				// Filter the result in memory by fullName
-				result = result.filter((client) =>
-					client?.fullName?.toLowerCase().includes(searchValue)
-				);
 			}
 
 			console.log('result2', result);
@@ -75,7 +67,7 @@ export async function GET(req: Request): Promise<NextResponse> {
 			};
 		}
 
-		const totalRecords = (await db.collection('clients').get()).size;
+		const totalRecords = (await db.collection('cases').get()).size;
 		const lastPage = Math.ceil(totalRecords / rowsPerPage);
 		const hasMorePages = page < lastPage;
 

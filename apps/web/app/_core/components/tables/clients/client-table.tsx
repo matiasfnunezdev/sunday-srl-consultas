@@ -171,7 +171,6 @@ export default function ClientsTable(props: UsersTableProps): JSX.Element {
 	}, [table.getState().columnFilters[0]?.id]);
 
 	useEffect(() => {
-		console.log('columnFilters', columnFilters);
 		onFiltersChange(columnFilters);
 	}, [columnFilters]);
 
