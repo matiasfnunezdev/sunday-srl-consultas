@@ -84,6 +84,7 @@ export function FooterComponent(props: FooterComponentProps) {
 							inProgress: false,
 							unreadMessagesCount: 0,
 							unread: false,
+							openCase: false,
 							closeCase: true,
 							tags: selectedTags,
 						},

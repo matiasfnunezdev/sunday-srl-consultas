@@ -73,39 +73,43 @@ export default function UnreadConversations(): JSX.Element {
 		}
 	}, [selectedConversation]);
 
-	const renderConversations = conversations?.map((conversation) => {
-		const isSelected =
-			selectedConversationSid === conversation?.conversationSId;
-		const selectedClasses = isSelected ? 'bg-neutral-500 rounded-lg' : '';
-		return (
-			<button
-				className={`flex flex-row justify-start items-center gap-2 cursor-pointer ${selectedClasses} p-4`}
-				disabled={isLoading}
-				key={conversation.conversationSId}
-				onClick={() => {
-					if (conversation?.conversationSId) {
-						handleSetSelectedConversationSid(conversation?.conversationSId);
-					}
-				}}
-				type="button"
-			>
-				<div className="relative h-10 w-10 rounded-md flex items-center justify-center text-white text-bold">
-					<img alt="whatsapp icon" className="rounded-md" src="/wpIcon.png" />
-					{conversation?.unreadMessagesCount &&
-					conversation?.unreadMessagesCount > 0 ? (
-						<span className="absolute flex flex-row justify-center items-center p-1 top-0 right-0 bg-blue-500 rounded-full h-3 w-3 text-[9px]">
-							{conversation?.unreadMessagesCount}
-						</span>
-					) : (
-						<span className="absolute flex flex-row justify-center items-center p-1 top-0 right-0 bg-red-500 rounded-full h-3 w-3 text-[9px]" />
-					)}
-				</div>
-				<div>
-					{conversation?.fullName ?? conversation?.author?.split('+')[1]}
-				</div>
-			</button>
-		);
-	});
+	const renderConversations = conversations
+		?.filter(
+			(conv) => conv?.unreadMessagesCount && conv?.unreadMessagesCount > 0
+		)
+		.map((conversation) => {
+			const isSelected =
+				selectedConversationSid === conversation?.conversationSId;
+			const selectedClasses = isSelected ? 'bg-neutral-500 rounded-lg' : '';
+			return (
+				<button
+					className={`flex flex-row justify-start items-center gap-2 cursor-pointer ${selectedClasses} p-4`}
+					disabled={isLoading}
+					key={conversation.conversationSId}
+					onClick={() => {
+						if (conversation?.conversationSId) {
+							handleSetSelectedConversationSid(conversation?.conversationSId);
+						}
+					}}
+					type="button"
+				>
+					<div className="relative h-10 w-10 rounded-md flex items-center justify-center text-white text-bold">
+						<img alt="whatsapp icon" className="rounded-md" src="/wpIcon.png" />
+						{conversation?.unreadMessagesCount &&
+						conversation?.unreadMessagesCount > 0 ? (
+							<span className="absolute flex flex-row justify-center items-center p-1 top-0 right-0 bg-blue-500 rounded-full h-3 w-3 text-[9px]">
+								{conversation?.unreadMessagesCount}
+							</span>
+						) : (
+							<span className="absolute flex flex-row justify-center items-center p-1 top-0 right-0 bg-red-500 rounded-full h-3 w-3 text-[9px]" />
+						)}
+					</div>
+					<div>
+						{conversation?.fullName ?? conversation?.author?.split('+')[1]}
+					</div>
+				</button>
+			);
+		});
 
 	return (
 		<div className="w-full bg-[#555759] rounded-md ">
@@ -119,7 +123,12 @@ export default function UnreadConversations(): JSX.Element {
 				<div className="flex flex-row justify-start items-center gap-2 text-left">
 					<span>Casos no leidos</span>
 					<span className="flex flex-row justify-center items-center p-1 top-0 right-0 bg-orange-500 rounded-full h-4 w-4 text-xs">
-						{conversations?.length}
+						{
+							conversations?.filter(
+								(conv) =>
+									conv?.unreadMessagesCount && conv?.unreadMessagesCount > 0
+							)?.length
+						}
 					</span>
 				</div>
 				{expandedPanel ? (
