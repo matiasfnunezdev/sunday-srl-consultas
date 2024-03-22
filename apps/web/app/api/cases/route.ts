@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
+import type { Query } from 'firebase-admin/firestore';
 import { firebaseAdmin } from '@/_core/firebase/firebase-admin';
 import { getOne, updateOne } from '@/_core/firebase/collection-helpers';
 import { validateFirebaseIdToken } from '@/_core/utils/verify-id-token';
 import type { ApiResponse } from '@/_domain/interfaces/user/user';
 import type { Client } from '@/_domain/interfaces/client';
+import { filterCasesByTagIds } from '@/_core/utils/filter-messages-by-tag-ids';
 
 export async function GET(req: Request): Promise<NextResponse> {
 	const url = new URL(req.url);
 	const messageSIdStart = url.searchParams.get('id');
-	const tagIds = url.searchParams.get('tagIds') ?? [];
+	const tagIds = url.searchParams.get('tagIds')?.split(',') ?? [];
 	const author = url.searchParams.get('author');
 	const page = Number(url.searchParams.get('page')) || 1;
 	const rowsPerPage = Number(url.searchParams.get('rowsPerPage')) || 10;
@@ -37,25 +39,26 @@ export async function GET(req: Request): Promise<NextResponse> {
 				response = {
 					success: false,
 					message: 'failure',
-					data: [],
+					data: undefined,
 				};
 			}
 		} else {
-			const query = db
-				.collection('clients')
-				.where('tags', 'array-contains-any', tagIds)
-				.limit(rowsPerPage)
-				.offset((page - 1) * rowsPerPage);
+			let query: Query = db.collection('cases');
+
+			if (author) {
+				query = query.where('author', '==', `whatsapp:+${author}`);
+			}
+
+			query = query.limit(rowsPerPage).offset((page - 1) * rowsPerPage);
 
 			const casesSnapshot = await query.get();
 
-			let result = casesSnapshot.docs.map((doc) => doc.data() as Client);
+			let result = casesSnapshot.docs.map((doc) => doc.data()) as any[];
 
 			console.log('result1', result);
 
-			if (author) {
-				// Filter the result in memory by author
-				result = result.filter((client) => client.author === author);
+			if (tagIds?.length) {
+				result = filterCasesByTagIds(result, tagIds);
 			}
 
 			console.log('result2', result);

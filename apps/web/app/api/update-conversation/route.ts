@@ -22,7 +22,11 @@ export async function POST(req: Request) {
 		if (payload?.closeCase) {
 			const cases = (await getAll(db, 'cases')) ?? [];
 
-			const openCase = cases.find((value) => value?.open);
+			const openCase = cases.find(
+				(value) => value?.open && value?.conversationSId === conversationSId
+			);
+
+			console.log('openCase', openCase);
 
 			if (openCase) {
 				await editOneByField(
