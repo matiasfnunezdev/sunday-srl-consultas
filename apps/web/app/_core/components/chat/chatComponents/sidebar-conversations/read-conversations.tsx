@@ -56,7 +56,10 @@ export default function ReadConversations(): JSX.Element {
 	}, [timeStamp]);
 
 	const renderConversations = conversations
-		?.filter((conversation) => !conversation.unread && conversation.inProgress)
+		?.filter(
+			(conv) =>
+				conv?.unreadMessagesCount === 0 && !conv?.unread && conv?.inProgress
+		)
 		.map((conversation) => {
 			const isSelected =
 				selectedConversationSid === conversation?.conversationSId;
@@ -103,8 +106,12 @@ export default function ReadConversations(): JSX.Element {
 						<span>Casos en curso</span>
 						<span className="flex flex-row justify-center items-center p-1 top-0 right-0 bg-blue-500 rounded-full h-4 w-4 text-xs">
 							{
-								conversations?.filter((conversation) => conversation.inProgress)
-									.length
+								conversations?.filter(
+									(conv) =>
+										conv?.unreadMessagesCount === 0 &&
+										!conv?.unread &&
+										conv?.inProgress
+								).length
 							}
 						</span>
 					</div>
