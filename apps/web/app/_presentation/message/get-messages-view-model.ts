@@ -26,7 +26,7 @@ export default function GetMessagesViewModel(): GetMessagesViewModelResponse {
 
 			if (response.success) {
 				setMessages(
-					response.data.map((message) => {
+					response?.data?.map((message) => {
 						const media = message?.media;
 						if (typeof media === 'string') {
 							// Clean and parse the media string
