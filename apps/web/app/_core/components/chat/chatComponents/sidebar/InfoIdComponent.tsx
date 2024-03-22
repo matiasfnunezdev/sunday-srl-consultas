@@ -44,6 +44,20 @@ export default function InfoIdComponent(): JSX.Element {
 				</button>
 			</button>
 
+			<button
+				className="flex w-full flex-shrink-0 cursor-pointer select-none items-center justify-between p-2 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+				type="button"
+			>
+				<div className="flex justify-between">
+					<div className="flex flex-col text-left p-2">
+						<span>Numero - {clientData?.author?.split(':')?.[1]}</span>
+					</div>
+				</div>
+				<button className="flex justify-between gap-2" type="button">
+					<FontAwesomeIcon icon={faPencil} />
+				</button>
+			</button>
+
 			{/* <div className="flex gap-6 py-4 px-2 justify-start text-white  shadow ">
         <div className="flex flex-col ">
           <span>Servicio: WhatsApp</span>
